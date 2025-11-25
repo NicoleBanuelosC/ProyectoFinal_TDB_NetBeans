@@ -33,9 +33,9 @@ public class ConexionBD {
         } catch (SQLException e) {
             System.err.println("Error de conexión: " + e.getMessage());
             e.printStackTrace();
-        }
+        }//Catch
         return conexion;
-    }
+    }//conection
     
     public static void cerrar() {
         try {
@@ -44,8 +44,8 @@ public class ConexionBD {
             }
         } catch (SQLException e) {
             e.printStackTrace();
-        }
-    }
+        }//catch
+    }//cerrar
     
 }//ConexionBD
 
