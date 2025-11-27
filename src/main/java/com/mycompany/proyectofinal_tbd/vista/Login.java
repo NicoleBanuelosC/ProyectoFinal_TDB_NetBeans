@@ -9,6 +9,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -22,51 +26,87 @@ public class Login extends JFrame {
     private JButton btnIniciarSesion;
 
     public Login() {
-        setUndecorated(true);
+        setTitle("INICIAR SESIÓN");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
+        setSize(800, 600); 
+        setLocationRelativeTo(null); // Centrar
+        setLayout(new BorderLayout());
 
-        GradientPanel panel = new GradientPanel();
-        panel.setLayout(new GridBagLayout());
+        // panel principal con dos columnas
+        JPanel mainPanel = new JPanel(new BorderLayout());
+        mainPanel.setBackground(Color.LIGHT_GRAY);
 
-        Font fuenteBase = new Font("Segoe UI", Font.PLAIN, 20);
-        Font fuenteTitulo = new Font("Segoe UI", Font.BOLD, 36);
-        Font fuenteBoton = new Font("Segoe UI", Font.BOLD, 22);
+        // izquierdo - imagen
+        JPanel panelImagen = new JPanel(new BorderLayout());
+        panelImagen.setPreferredSize(new Dimension(400, 0));
+        panelImagen.setBackground(Color.WHITE);
 
-        JLabel lblTitulo = new JLabel("INICIO DE SESIÓN");
+        // cargar imagen
+        try {
+            URL imageUrl = getClass().getResource("/com/mycompany/proyectofinal_tbd/imagenes/teatro.jpg");
+            if (imageUrl != null) {
+                BufferedImage img = ImageIO.read(imageUrl);
+                JLabel labelImagen = new JLabel(new ImageIcon(img));
+                labelImagen.setHorizontalAlignment(JLabel.CENTER);
+                panelImagen.add(labelImagen, BorderLayout.CENTER);
+                
+            } else {
+                JLabel labelError = new JLabel("Imagen no encontrada", JLabel.CENTER);
+                labelError.setForeground(Color.RED);
+                panelImagen.add(labelError, BorderLayout.CENTER);
+                
+            }//Else
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            JLabel labelError = new JLabel("Error al cargar imagen", JLabel.CENTER);
+            labelError.setForeground(Color.RED);
+            panelImagen.add(labelError, BorderLayout.CENTER);
+        }//acthc
+
+        // derecho - login
+        JPanel panelFormulario = new JPanel(new GridBagLayout());
+        panelFormulario.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        panelFormulario.setBackground(Color.WHITE);
+
+        Font fuenteBase = new Font("Segoe UI", Font.PLAIN, 18);
+        Font fuenteTitulo = new Font("Segoe UI", Font.BOLD, 28);
+        Font fuenteBoton = new Font("Segoe UI", Font.BOLD, 20);
+
+        JLabel lblTitulo = new JLabel("INICIAR SESIÓN");
         lblTitulo.setFont(fuenteTitulo);
         lblTitulo.setForeground(new Color(80, 50, 20));
 
-        JLabel lblUsuario = new JLabel("Usuario:");
+        JLabel lblUsuario = new JLabel("Ingrese Usuario");
         lblUsuario.setFont(fuenteBase);
         lblUsuario.setForeground(new Color(80, 50, 20));
 
-        JLabel lblContrasena = new JLabel("Contraseña:");
+        JLabel lblContrasena = new JLabel("Ingrese Contraseña");
         lblContrasena.setFont(fuenteBase);
         lblContrasena.setForeground(new Color(80, 50, 20));
 
         txtUsuario = new JTextField(15);
         txtUsuario.setFont(fuenteBase);
-        txtUsuario.setPreferredSize(new Dimension(350, 50));
+        txtUsuario.setPreferredSize(new Dimension(250, 40));
         txtUsuario.setFocusable(true);
         txtUsuario.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(new Color(180, 150, 100), 2),
-            BorderFactory.createEmptyBorder(5, 15, 5, 15)
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
 
         txtContrasena = new JPasswordField(15);
         txtContrasena.setFont(fuenteBase);
-        txtContrasena.setPreferredSize(new Dimension(350, 50));
+        txtContrasena.setPreferredSize(new Dimension(250, 40));
         txtContrasena.setFocusable(true);
         txtContrasena.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(new Color(180, 150, 100), 2),
-            BorderFactory.createEmptyBorder(5, 15, 5, 15)
+            BorderFactory.createEmptyBorder(5, 10, 5, 10)
         ));
 
-        btnIniciarSesion = new JButton("Iniciar Sesión");
+        btnIniciarSesion = new JButton(" INGRESAR ");
         btnIniciarSesion.setFont(fuenteBoton);
-        btnIniciarSesion.setPreferredSize(new Dimension(280, 60));
-        btnIniciarSesion.setBackground(new Color(139, 115, 85));
+        btnIniciarSesion.setPreferredSize(new Dimension(200, 50));
+        btnIniciarSesion.setBackground(new Color(60, 120, 255));
         btnIniciarSesion.setForeground(Color.WHITE);
         btnIniciarSesion.setFocusable(true);
         btnIniciarSesion.setCursor(new Cursor(Cursor.HAND_CURSOR));
@@ -76,23 +116,36 @@ public class Login extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 autenticar();
-            }
+            }//actionPerformed
         });
 
         txtUsuario.addActionListener(e -> autenticar());
         txtContrasena.addActionListener(e -> autenticar());
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(12, 12, 12, 12);
+        gbc.insets = new Insets(10, 10, 10, 10);
+        gbc.anchor = GridBagConstraints.WEST;
 
-        gbc.gridy = 0; panel.add(lblTitulo, gbc);
-        gbc.gridy = 1; panel.add(lblUsuario, gbc);
-        gbc.gridy = 2; panel.add(txtUsuario, gbc);
-        gbc.gridy = 3; panel.add(lblContrasena, gbc);
-        gbc.gridy = 4; panel.add(txtContrasena, gbc);
-        gbc.gridy = 5; panel.add(btnIniciarSesion, gbc);
+        gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
+        panelFormulario.add(lblTitulo, gbc);
 
-        add(panel);
+        gbc.gridx = 0; gbc.gridy = 1; gbc.gridwidth = 1;
+        panelFormulario.add(lblUsuario, gbc);
+        gbc.gridx = 1;
+        panelFormulario.add(txtUsuario, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 2;
+        panelFormulario.add(lblContrasena, gbc);
+        gbc.gridx = 1;
+        panelFormulario.add(txtContrasena, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 3; gbc.gridwidth = 2;
+        panelFormulario.add(btnIniciarSesion, gbc);
+
+        mainPanel.add(panelImagen, BorderLayout.WEST);
+        mainPanel.add(panelFormulario, BorderLayout.CENTER);
+
+        add(mainPanel);
 
         SwingUtilities.invokeLater(() -> txtUsuario.requestFocusInWindow());
     }//public Login
@@ -101,41 +154,52 @@ public class Login extends JFrame {
         String usuario = txtUsuario.getText().trim();
         String contrasena = new String(txtContrasena.getPassword());
 
-        if ("nicole".equals(usuario) && "1234".equals(contrasena)) {
+        if ("productor@teatro.com".equals(usuario) && "prd123".equals(contrasena)) {
             JOptionPane.showMessageDialog(this,
-                "¡Bienvenida, " + usuario + "!",
+                "¡Bienvenido, Productor!",
                 "Éxito",
                 JOptionPane.INFORMATION_MESSAGE);
             dispose();
-        } else {
+            new MainScreen("productor").setVisible(true);
+        }//if
+        
+        else if ("miembro@teatro.com".equals(usuario) && "miem123".equals(contrasena)) {
             JOptionPane.showMessageDialog(this,
-                "Usuario o contraseña incorrectos.",
-                "Error de autenticación",
+                "¡Bienvenido, Miembro!",
+                "Éxito",
+                JOptionPane.INFORMATION_MESSAGE);
+            dispose();
+            new MainScreen("miembro").setVisible(true);
+        }//else if
+        
+        else if ("oficial@teatro.com".equals(usuario) && "ofc123".equals(contrasena)) {
+            JOptionPane.showMessageDialog(this,
+                "¡Bienvenido, Oficial!",
+                "Éxito",
+                JOptionPane.INFORMATION_MESSAGE);
+            dispose();
+            new MainScreen("oficial").setVisible(true);
+        }//Else if
+        
+        else if ("admin@teatro.com".equals(usuario) && "adm123".equals(contrasena)) {
+            JOptionPane.showMessageDialog(this,
+                "¡Bienvenido, Administrador!",
+                "Éxito",
+                JOptionPane.INFORMATION_MESSAGE);
+            dispose();
+            new MainScreen("administrador").setVisible(true);
+        }//Else if
+        
+        else {
+            JOptionPane.showMessageDialog(this,
+                "Usuario o contraseña incorrectos.\n Cada rol tiene una contraseña fija asignada ",
+                "Acceso denegado",
                 JOptionPane.ERROR_MESSAGE);
             txtContrasena.selectAll();
-            txtContrasena.requestFocusInWindow();
+            txtUsuario.requestFocus();
         }//else
+        
     }//autenticar
-
-    private static class GradientPanel extends JPanel {
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            Graphics2D g2d = (Graphics2D) g.create();
-            g2d.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-
-            int w = getWidth();
-            int h = getHeight();
-
-            Color c1 = new Color(250, 240, 220); // Beige muy claro
-            Color c2 = new Color(240, 225, 190); // Beige cálido
-
-            GradientPaint gradient = new GradientPaint(0, 0, c1, 0, h, c2);
-            g2d.setPaint(gradient);
-            g2d.fillRect(0, 0, w, h);
-            g2d.dispose();
-        }//public pintar
-    }
 
     public static void main(String[] args) {
         try {
