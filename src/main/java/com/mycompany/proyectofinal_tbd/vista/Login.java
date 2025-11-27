@@ -14,6 +14,7 @@ import java.awt.event.ActionListener;
  *
  * @author banue
  */
+
 public class Login extends JFrame {
 
     private JTextField txtUsuario;
@@ -144,6 +145,7 @@ public class Login extends JFrame {
         }//Try catch
 
         SwingUtilities.invokeLater(() -> new Login().setVisible(true));
+        
     }//void main
     
 }//public class

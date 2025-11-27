@@ -61,6 +61,7 @@ public class ObraDAOImpl implements ObraDAO {
                     if (conn != null) conn.rollback();
                 } catch (SQLException ex) {
                     ex.printStackTrace();
+                    
                 }//catch
                 e.printStackTrace();
                 onError.run();
@@ -70,7 +71,9 @@ public class ObraDAOImpl implements ObraDAO {
                     // nO cerramos la conexión aquí porque usamos Singleton
                 } catch (SQLException e) {
                     e.printStackTrace();
+                    
                 }//catch
+                
             }//finally
         }).start();
         
@@ -116,8 +119,11 @@ public class ObraDAOImpl implements ObraDAO {
                     // NO cerramos conexión (Singleton)
                 } catch (SQLException e) {
                     e.printStackTrace();
+                    
                 }//Cacth
+                
             }//finally
+            
         }).start();
     }//actualizar
 
@@ -168,9 +174,13 @@ public class ObraDAOImpl implements ObraDAO {
                     // NO cerramos conexión
                 } catch (SQLException e) {
                     e.printStackTrace();
+                    
                 }//Cacth
+                
             }//finally
+            
         }).start();
+        
     }//elimminar
 
     @Override
@@ -198,6 +208,7 @@ public class ObraDAOImpl implements ObraDAO {
             }//if
         } catch (SQLException e) {
             e.printStackTrace();
+            
         } finally {
             try {
                 if (rs != null) rs.close();
@@ -205,8 +216,11 @@ public class ObraDAOImpl implements ObraDAO {
                 // NO cerramos conexión
             } catch (SQLException e) {
                 e.printStackTrace();
+                
             }//Catch
+            
         }//finally
+        
         return null;
     }//buscarPorId
 
@@ -235,6 +249,7 @@ public class ObraDAOImpl implements ObraDAO {
             }//while
         } catch (SQLException e) {
             e.printStackTrace();
+            
         } finally {
             try {
                 if (rs != null) rs.close();
@@ -244,6 +259,9 @@ public class ObraDAOImpl implements ObraDAO {
                 e.printStackTrace();
             }//catch
         }//finally
+        
         return obras;
+        
     }//listar
+    
 }//public class

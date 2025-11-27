@@ -8,6 +8,7 @@ package com.mycompany.proyectofinal_tbd.modelo;
  *
  * @author banue
  */
+
 public class Obra {
     private Long idObra;
     private String titulo;
