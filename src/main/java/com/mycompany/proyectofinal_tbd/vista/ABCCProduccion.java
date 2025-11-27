@@ -50,28 +50,32 @@ public class ABCCProduccion extends JFrame{
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.anchor = GridBagConstraints.WEST;
 
-        gbc.gridx = 0; gbc.gridy = 0;
+        gbc.gridx = 0; 
+        gbc.gridy = 0;
         panelForm.add(new JLabel("Obra *:"), gbc);
         gbc.gridx = 1;
         comboObra = new JComboBox<>();
         comboObra.setFont(fuenteBase);
         panelForm.add(comboObra, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 1;
+        gbc.gridx = 0; 
+        gbc.gridy = 1;
         panelForm.add(new JLabel("Temporada *:"), gbc);
         gbc.gridx = 1;
         comboTemporada = new JComboBox<>(new String[]{"otono", "primavera"});
         comboTemporada.setFont(fuenteBase);
         panelForm.add(comboTemporada, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 2;
+        gbc.gridx = 0;
+        gbc.gridy = 2;
         panelForm.add(new JLabel("Año *:"), gbc);
         gbc.gridx = 1;
         txtAnio = new JTextField(10);
         txtAnio.setFont(fuenteBase);
         panelForm.add(txtAnio, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 3;
+        gbc.gridx = 0;
+        gbc.gridy = 3;
         panelForm.add(new JLabel("Productor *:"), gbc);
         gbc.gridx = 1;
         comboProductor = new JComboBox<>();

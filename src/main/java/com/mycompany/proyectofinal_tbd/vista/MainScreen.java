@@ -81,8 +81,11 @@ public class MainScreen extends JFrame {
         panel.add(sep);
 
         agregarBoton(panel, "Inicio", e -> mostrarInicio());
-        agregarBoton(panel, "Obras", e -> abrirABCC("Obra"));
-        agregarBoton(panel, "Producciones", e -> abrirABCC("Producción"));
+        
+        //para que abra estas al darle click
+        //las dos tablas relacionadas
+        agregarBoton(panel, "Obras", e -> new ABCCObra().setVisible(true));
+        agregarBoton(panel, "Producciones", e -> new ABCCProduccion().setVisible(true));
 
         if ("administrador".equals(rolActual) || "oficial".equals(rolActual)) {
             agregarBoton(panel, "Miembros", e -> abrirABCC("Miembro"));

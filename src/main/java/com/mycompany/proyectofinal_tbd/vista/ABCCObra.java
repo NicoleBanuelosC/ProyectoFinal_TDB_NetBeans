@@ -1,0 +1,280 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
+package com.mycompany.proyectofinal_tbd.vista;
+
+import com.mycompany.proyectofinal_tbd.dao.ObraDAO;
+import com.mycompany.proyectofinal_tbd.dao.ObraDAOImpl;
+import com.mycompany.proyectofinal_tbd.modelo.Obra;
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+/**
+ *
+ * @author banue
+ */
+public class ABCCObra extends JFrame{
+    private ObraDAO obraDAO = new ObraDAOImpl();
+    private DefaultTableModel modeloTabla;
+    private JTable tablaObras;
+
+    private JTextField txtTitulo, txtAutor, txtNumeroActos;
+    private JComboBox<String> comboTipo;
+
+    private JButton btnGuardar, btnEditar, btnEliminar, btnLimpiar;
+    private Obra obraSeleccionada = null;
+
+    public ABCCObra() {
+        setTitle("Gestión de Obras");
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setSize(900, 650);
+        setLocationRelativeTo(null);
+        setLayout(new BorderLayout());
+
+        Font fuenteBase = new Font("Segoe UI", Font.PLAIN, 16);
+        Font fuenteBoton = new Font("Segoe UI", Font.BOLD, 16);
+
+        JPanel panelForm = new JPanel(new GridBagLayout());
+        panelForm.setBorder(BorderFactory.createTitledBorder("Datos de la Obra"));
+        panelForm.setFont(fuenteBase);
+
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.anchor = GridBagConstraints.WEST;
+
+        gbc.gridx = 0; 
+        gbc.gridy = 0;
+        panelForm.add(new JLabel("Título *:"), gbc);
+        gbc.gridx = 1;
+        txtTitulo = new JTextField(20);
+        txtTitulo.setFont(fuenteBase);
+        panelForm.add(txtTitulo, gbc);
+
+        gbc.gridx = 0; 
+        gbc.gridy = 1;
+        panelForm.add(new JLabel("Autor *:"), gbc);
+        gbc.gridx = 1;
+        txtAutor = new JTextField(20);
+        txtAutor.setFont(fuenteBase);
+        panelForm.add(txtAutor, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 2;
+        panelForm.add(new JLabel("Tipo *:"), gbc);
+        gbc.gridx = 1;
+        comboTipo = new JComboBox<>(new String[]{"drama", "comedia", "musical", "infantil", "otro"});
+        comboTipo.setFont(fuenteBase);
+        panelForm.add(comboTipo, gbc);
+
+        gbc.gridx = 0; 
+        gbc.gridy = 3;
+        panelForm.add(new JLabel("Número de Actos *:"), gbc);
+        gbc.gridx = 1;
+        txtNumeroActos = new JTextField(10);
+        txtNumeroActos.setFont(fuenteBase);
+        panelForm.add(txtNumeroActos, gbc);
+
+        JPanel panelBotones = new JPanel(new FlowLayout());
+        btnGuardar = new JButton("Guardar");
+        btnEditar = new JButton("Editar");
+        btnEliminar = new JButton("Eliminar");
+        btnLimpiar = new JButton("Limpiar");
+
+        estiloBoton(btnGuardar, fuenteBoton);
+        estiloBoton(btnEditar, fuenteBoton);
+        estiloBoton(btnEliminar, fuenteBoton);
+        estiloBoton(btnLimpiar, fuenteBoton);
+
+        panelBotones.add(btnGuardar);
+        panelBotones.add(btnEditar);
+        panelBotones.add(btnEliminar);
+        panelBotones.add(btnLimpiar);
+
+        //tabla
+        String[] columnas = {"ID", "Título", "Autor", "Tipo", "Actos"};
+        modeloTabla = new DefaultTableModel(columnas, 0) {
+            @Override public boolean isCellEditable(int row, int column) { return false; }
+        };
+        tablaObras = new JTable(modeloTabla);
+        tablaObras.setFont(fuenteBase);
+        tablaObras.setRowHeight(25);
+        tablaObras.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        tablaObras.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int fila = tablaObras.getSelectedRow();
+                if (fila >= 0) {
+                    cargarObraSeleccionada(fila);
+                }//if adentro
+            }//if afeura
+        });
+
+        //Actionlistaener
+        btnGuardar.addActionListener(e -> guardarObra());
+        btnEditar.addActionListener(e -> editarObra());
+        btnEliminar.addActionListener(e -> eliminarObra());
+        btnLimpiar.addActionListener(e -> limpiarFormulario());
+
+        add(panelForm, BorderLayout.NORTH);
+        add(new JScrollPane(tablaObras), BorderLayout.CENTER);
+        add(panelBotones, BorderLayout.SOUTH);
+
+        cargarObras();
+        
+    }//puiblic abbc obra
+
+    private void estiloBoton(JButton btn, Font fuente) {
+        btn.setFont(fuente);
+        btn.setPreferredSize(new Dimension(120, 32));
+        btn.setFocusable(true);
+        btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btn.setBackground(new Color(139, 115, 85));
+        btn.setForeground(Color.WHITE);
+    }//EstiloBotno
+
+    private void guardarObra() {
+        if (!validarCampos()) return;
+
+        Obra obra = new Obra();
+        obra.setTitulo(txtTitulo.getText().trim());
+        obra.setAutor(txtAutor.getText().trim());
+        obra.setTipo((String) comboTipo.getSelectedItem());
+        obra.setNumeroActos(Integer.parseInt(txtNumeroActos.getText().trim()));
+
+        obraDAO.insertar(obra, () -> {
+                JOptionPane.showMessageDialog(this, "Obra guardada", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                limpiarFormulario();
+                cargarObras();
+            },
+            () -> JOptionPane.showMessageDialog(this, "Error al guardar", "Error", JOptionPane.ERROR_MESSAGE)
+        );
+    }//guardarObra
+
+    private void editarObra() {
+        if (obraSeleccionada == null) {
+            JOptionPane.showMessageDialog(this, "Seleccione una obra", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }//if
+        
+        if (!validarCampos()) return;
+
+        obraSeleccionada.setTitulo(txtTitulo.getText().trim());
+        obraSeleccionada.setAutor(txtAutor.getText().trim());
+        obraSeleccionada.setTipo((String) comboTipo.getSelectedItem());
+        obraSeleccionada.setNumeroActos(Integer.parseInt(txtNumeroActos.getText().trim()));
+
+        obraDAO.actualizar(obraSeleccionada,() -> {
+                JOptionPane.showMessageDialog(this, "Obra actualizada", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                limpiarFormulario();
+                cargarObras();
+            },
+            () -> JOptionPane.showMessageDialog(this, "Error al actualizar", "Error", JOptionPane.ERROR_MESSAGE)
+        );
+    }//editarObra
+
+    private void eliminarObra() {
+        if (obraSeleccionada == null) {
+            JOptionPane.showMessageDialog(this, "Seleccione una obra", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            return;
+        }//if
+
+        int confirm = JOptionPane.showConfirmDialog(this,
+            "¿Eliminar la obra '" + obraSeleccionada.getTitulo() + "'?\n(Se eliminarán sus producciones si existen)",
+            "Confirmar eliminación",
+            JOptionPane.YES_NO_OPTION);
+        
+        if (confirm == JOptionPane.YES_OPTION) {
+            obraDAO.eliminar(obraSeleccionada.getIdObra(), () -> {
+                    JOptionPane.showMessageDialog(this, "Obra eliminada", "Éxito", JOptionPane.INFORMATION_MESSAGE);
+                    limpiarFormulario();
+                    cargarObras();
+                },
+                () -> JOptionPane.showMessageDialog(this, "Error al eliminar", "Error", JOptionPane.ERROR_MESSAGE)
+            );
+        }//if
+        
+    }//eliminarObra
+
+    private boolean validarCampos() {
+        if (txtTitulo.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "El título es obligatorio", "Error", JOptionPane.ERROR_MESSAGE);
+            txtTitulo.requestFocus();
+            return false;
+        }//if
+        
+        if (txtAutor.getText().trim().isEmpty()) {
+            JOptionPane.showMessageDialog(this, "El autor es obligatorio", "Error", JOptionPane.ERROR_MESSAGE);
+            txtAutor.requestFocus();
+            return false;
+        }//if
+        
+        try {
+            int actos = Integer.parseInt(txtNumeroActos.getText().trim());
+            if (actos <= 0 || actos > 10) {
+                JOptionPane.showMessageDialog(this, "Número de actos debe estar entre 1 y 10", "Error", JOptionPane.ERROR_MESSAGE);
+                txtNumeroActos.requestFocus();
+                return false;
+            }//if
+            
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "Número de actos debe ser un entero válido", "Error", JOptionPane.ERROR_MESSAGE);
+            txtNumeroActos.requestFocus();
+            return false;
+        }//catch
+        
+        return true;
+        
+    }//validarCampos
+
+    private void cargarObraSeleccionada(int fila) {
+        Long idObra = (Long) modeloTabla.getValueAt(fila, 0);
+        obraSeleccionada = obraDAO.buscarPorId(idObra);
+
+        if (obraSeleccionada != null) {
+            txtTitulo.setText(obraSeleccionada.getTitulo());
+            txtAutor.setText(obraSeleccionada.getAutor());
+            comboTipo.setSelectedItem(obraSeleccionada.getTipo());
+            txtNumeroActos.setText(String.valueOf(obraSeleccionada.getNumeroActos()));
+        }//If
+        
+    }//cargarObraSeleccionada
+
+    private void limpiarFormulario() {
+        txtTitulo.setText("");
+        txtAutor.setText("");
+        txtNumeroActos.setText("");
+        comboTipo.setSelectedIndex(0);
+        obraSeleccionada = null;
+    }//limpiarFormulario
+
+    private void cargarObras() {
+        modeloTabla.setRowCount(0);
+        java.util.List<Obra> obras = obraDAO.listarTodas();
+        for (Obra o : obras) {
+            modeloTabla.addRow(new Object[]{
+                o.getIdObra(),
+                o.getTitulo(),
+                o.getAutor(),
+                o.getTipo(),
+                o.getNumeroActos()
+            });
+        }//for
+    }//cargarObras
+
+    public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        }//catch
+        
+        SwingUtilities.invokeLater(() -> new ABCCObra().setVisible(true));
+        
+    }//void main
+    
+}//public class
