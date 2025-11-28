@@ -17,15 +17,14 @@
     </properties>
     
     <dependencies>
-        
+        <!-- ✅ Driver JDBC de Oracle - desde Maven Central -->
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>
             <artifactId>ojdbc8</artifactId>
             <version>21.9.0.0</version>
-            <scope>system</scope>
-            <systemPath>C:\Users\banue\Desktop\ojdbc8-21.9.0.0.jar</systemPath> 
         </dependency>
         
+        <!-- JUnit para pruebas -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-api</artifactId>
@@ -33,16 +32,17 @@
             <scope>test</scope>
         </dependency>
         
+        <!-- SLF4J (opcional, pero buena práctica) -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>2.0.12</version>
         </dependency>
-        
     </dependencies>
     
     <build>
         <plugins>
+            <!-- Compilador de Java -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -52,6 +52,7 @@
                 </configuration>
             </plugin>
             
+            <!-- Empaquetado con dependencias (opcional, útil para JAR ejecutable) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -76,7 +77,6 @@
                     </execution>
                 </executions>
             </plugin>
-            
         </plugins>
     </build>
     
