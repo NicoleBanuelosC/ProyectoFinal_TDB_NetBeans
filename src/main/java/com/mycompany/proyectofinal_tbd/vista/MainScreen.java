@@ -101,7 +101,7 @@ public class MainScreen extends JFrame {
                 JOptionPane.YES_NO_OPTION);
             if (confirm == JOptionPane.YES_OPTION) {
                 dispose();
-                new Login().setVisible(true);
+                new LoginJava().setVisible(true);
             }//if
         });
 
