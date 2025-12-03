@@ -85,6 +85,7 @@ public class MainScreen extends JFrame {
         agregarBoton(panel, "Inicio", e -> mostrarInicio());
         agregarBoton(panel, "Obras", e -> new ABCCObra().setVisible(true));
         agregarBoton(panel, "Producciones", e -> new ABCCProduccion().setVisible(true));
+        //agregarBoton(panel, "Reportes", e -> new ReportesView().setVisible(true));
 
         // cerrar sesión
         agregarBoton(panel, "Cerrar Sesión", e -> {

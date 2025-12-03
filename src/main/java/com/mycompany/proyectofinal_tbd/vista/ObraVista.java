@@ -11,14 +11,42 @@ package com.mycompany.proyectofinal_tbd.vista;
 public class ObraVista extends javax.swing.JFrame {
     
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(ObraVista.class.getName());
+    private com.mycompany.proyectofinal_tbd.dao.ObraDAO obraDAO = new com.mycompany.proyectofinal_tbd.dao.ObraDAOImpl();
+    private javax.swing.table.DefaultTableModel modeloTabla;
+    private javax.swing.JTable tablaObras;
 
+    private javax.swing.JTextField txtTitulo, txtAutor, txtNumeroActos;
+    private javax.swing.JComboBox<String> comboTipo;
+
+    private javax.swing.JButton btnGuardar, btnEditar, btnEliminar, btnLimpiar;
+    private com.mycompany.proyectofinal_tbd.modelo.Obra obraSeleccionada = null;
     /**
      * Creates new form ObraVista
      */
     public ObraVista() {
         initComponents();
+         configurarVentana();
+        cargarObras();
     }
 
+    private void configurarVentana() {
+        setTitle("Gestión de Obras");
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setSize(900, 650);
+        setLocationRelativeTo(null);
+
+        getContentPane().setBackground(new java.awt.Color(255, 240, 248)); 
+
+        estiloBoton(btnGuardar, new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 16), new java.awt.Color(180, 240, 200));
+        estiloBoton(btnEditar, new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 16), new java.awt.Color(200, 130, 150));
+        estiloBoton(btnEliminar, new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 16), new java.awt.Color(255, 180, 180));
+        estiloBoton(btnLimpiar, new java.awt.Font("Segoe UI", java.awt.Font.BOLD, 16), new java.awt.Color(230, 230, 250));
+
+        tablaObras.getTableHeader().setBackground(new java.awt.Color(230, 180, 200));
+        tablaObras.getTableHeader().setForeground(java.awt.Color.WHITE);
+        tablaObras.setSelectionBackground(new java.awt.Color(200, 130, 150));
+    }//configurarVentana
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -71,4 +99,148 @@ public class ObraVista extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     // End of variables declaration//GEN-END:variables
-}
+
+    //Mis metodos
+    private void estiloBoton(javax.swing.JButton btn, java.awt.Font fuente, java.awt.Color colorFondo) {
+        btn.setFont(fuente);
+        btn.setPreferredSize(new java.awt.Dimension(120, 32));
+        btn.setFocusable(false);
+        btn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btn.setBackground(colorFondo);
+        btn.setForeground(java.awt.Color.WHITE);
+        btn.setBorderPainted(false);
+        btn.setOpaque(true);
+    }//EstiloBotno
+
+    //akta
+    private void guardarObra() {
+        if (!validarCampos()) return;
+
+        com.mycompany.proyectofinal_tbd.modelo.Obra obra = new com.mycompany.proyectofinal_tbd.modelo.Obra();
+        obra.setTitulo(txtTitulo.getText().trim());
+        obra.setAutor(txtAutor.getText().trim());
+        obra.setTipo((String) comboTipo.getSelectedItem());
+        obra.setNumeroActos(Integer.parseInt(txtNumeroActos.getText().trim()));
+
+        obraDAO.insertar(obra, () -> {
+                javax.swing.JOptionPane.showMessageDialog(this, "Obra guardada", "Éxito", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                limpiarFormulario();
+                cargarObras();
+            },
+            () -> javax.swing.JOptionPane.showMessageDialog(this, "Error al guardar", "Error", javax.swing.JOptionPane.ERROR_MESSAGE)
+        );
+    }//guardarObra
+
+    //cmabios
+    private void editarObra() {
+        if (obraSeleccionada == null) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Seleccione una obra", "Advertencia", javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }//if
+
+        if (!validarCampos()) return;
+
+        obraSeleccionada.setTitulo(txtTitulo.getText().trim());
+        obraSeleccionada.setAutor(txtAutor.getText().trim());
+        obraSeleccionada.setTipo((String) comboTipo.getSelectedItem());
+        obraSeleccionada.setNumeroActos(Integer.parseInt(txtNumeroActos.getText().trim()));
+
+        obraDAO.actualizar(obraSeleccionada,() -> {
+                javax.swing.JOptionPane.showMessageDialog(this, "Obra actualizada", "Éxito", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                limpiarFormulario();
+                cargarObras();
+            },
+            () -> javax.swing.JOptionPane.showMessageDialog(this, "Error al actualizar", "Error", javax.swing.JOptionPane.ERROR_MESSAGE)
+        );
+    }//EditarObra
+
+    //baja
+    private void eliminarObra() {
+        if (obraSeleccionada == null) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Seleccione una obra", "Advertencia", javax.swing.JOptionPane.WARNING_MESSAGE);
+            return;
+        }//if
+
+        int confirm = javax.swing.JOptionPane.showConfirmDialog(this,
+            "¿Eliminar la obra '" + obraSeleccionada.getTitulo() + "'?\n(Se eliminarán sus producciones si existen)",
+            "Confirmar eliminación",
+            javax.swing.JOptionPane.YES_NO_OPTION);
+
+        if (confirm == javax.swing.JOptionPane.YES_OPTION) {
+            obraDAO.eliminar(obraSeleccionada.getIdObra(), () -> {
+                    javax.swing.JOptionPane.showMessageDialog(this, "Obra eliminada", "Éxito", javax.swing.JOptionPane.INFORMATION_MESSAGE);
+                    limpiarFormulario();
+                    cargarObras();
+                },
+                () -> javax.swing.JOptionPane.showMessageDialog(this, "Error al eliminar", "Error", javax.swing.JOptionPane.ERROR_MESSAGE)
+            );
+        }//if
+    }//eliminarObra   
+
+    //validacion de datos 
+    private boolean validarCampos() {
+        if (txtTitulo.getText().trim().isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "El título es obligatorio", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            txtTitulo.requestFocus();
+            return false;
+        }//if
+
+        if (txtAutor.getText().trim().isEmpty()) {
+            javax.swing.JOptionPane.showMessageDialog(this, "El autor es obligatorio", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            txtAutor.requestFocus();
+            return false;
+        }//if
+
+        try {
+            int actos = Integer.parseInt(txtNumeroActos.getText().trim());
+            if (actos <= 0 || actos > 10) {
+                javax.swing.JOptionPane.showMessageDialog(this, "Número de actos debe estar entre 1 y 10", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+                txtNumeroActos.requestFocus();
+                return false;
+            }//if
+            
+        } catch (NumberFormatException e) {
+            javax.swing.JOptionPane.showMessageDialog(this, "Número de actos debe ser un entero válido", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            txtNumeroActos.requestFocus();
+            return false;
+        }//Catch
+
+        return true;
+    }//validarCampos
+
+    private void cargarObraSeleccionada(int fila) {
+        Long idObra = (Long) modeloTabla.getValueAt(fila, 0);
+        obraSeleccionada = obraDAO.buscarPorId(idObra);
+
+        if (obraSeleccionada != null) {
+            txtTitulo.setText(obraSeleccionada.getTitulo());
+            txtAutor.setText(obraSeleccionada.getAutor());
+            comboTipo.setSelectedItem(obraSeleccionada.getTipo());
+            txtNumeroActos.setText(String.valueOf(obraSeleccionada.getNumeroActos()));
+        }//if
+    }//cargarObra
+
+    private void limpiarFormulario() {
+        txtTitulo.setText("");
+        txtAutor.setText("");
+        txtNumeroActos.setText("");
+        comboTipo.setSelectedIndex(0);
+        obraSeleccionada = null;
+    }//limpiar
+
+    private void cargarObras() {
+        modeloTabla.setRowCount(0);
+        java.util.List<com.mycompany.proyectofinal_tbd.modelo.Obra> obras = obraDAO.listarTodas();
+        for (com.mycompany.proyectofinal_tbd.modelo.Obra o : obras) {
+            modeloTabla.addRow(new Object[]{
+                o.getIdObra(),
+                o.getTitulo(),
+                o.getAutor(),
+                o.getTipo(),
+                o.getNumeroActos()
+            });
+        }//for
+        
+    }//cargraObras
+    
+}//opublicsclass
