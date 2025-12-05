@@ -3,6 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package com.mycompany.proyectofinal_tbd.vista;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -56,17 +57,27 @@ public class ObraVista extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jPanel1 = new javax.swing.JPanel();
+
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jPanel1.setLayout(new java.awt.BorderLayout());
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1140, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(520, 520, 520)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(620, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 774, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(262, 262, 262)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(512, Short.MAX_VALUE))
         );
 
         pack();
@@ -98,6 +109,7 @@ public class ObraVista extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel jPanel1;
     // End of variables declaration//GEN-END:variables
 
     //Mis metodos
@@ -179,34 +191,84 @@ public class ObraVista extends javax.swing.JFrame {
 
     //validacion de datos 
     private boolean validarCampos() {
-        if (txtTitulo.getText().trim().isEmpty()) {
-            javax.swing.JOptionPane.showMessageDialog(this, "El título es obligatorio", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+    // validar el titulo, que solo acepte letras y espacios 
+        String titulo = txtTitulo.getText().trim();
+        if (titulo.isEmpty()) {
+            JOptionPane.showMessageDialog(this, 
+                "El título es obligatorio.\nPor favor, ingresa el nombre de la obra.", 
+                "Campo obligatorio", 
+                JOptionPane.WARNING_MESSAGE);
+            txtTitulo.requestFocus();
+            return false;
+        }//if
+        
+        if (!titulo.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+")) {
+            JOptionPane.showMessageDialog(this, 
+                "El título solo puede contener letras y espacios.\nPor ejemplo: \"Romeo y Julieta\"", 
+                "Lo que etsas ingresando es un formato inválido", 
+                JOptionPane.ERROR_MESSAGE);
+            txtTitulo.selectAll();
             txtTitulo.requestFocus();
             return false;
         }//if
 
-        if (txtAutor.getText().trim().isEmpty()) {
-            javax.swing.JOptionPane.showMessageDialog(this, "El autor es obligatorio", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+        // validar el autor, que solo acepte letras y espacios
+        String autor = txtAutor.getText().trim();
+        if (autor.isEmpty()) {
+            JOptionPane.showMessageDialog(this, 
+                "El autor es obligatorio.\nPor favor, ingresa el nombre del autor.", 
+                "Campo obligatorio", 
+                JOptionPane.WARNING_MESSAGE);
+            txtAutor.requestFocus();
+            return false;
+        }//if
+        
+        if (!autor.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ\\s]+")) {
+            JOptionPane.showMessageDialog(this, 
+                "El autor solo puede contener letras y espacios.\nPor ejemplo: \"William Shakespeare\"", 
+                "Lo que estas ingresando es un formato inválido", 
+                JOptionPane.ERROR_MESSAGE);
+            txtAutor.selectAll();
             txtAutor.requestFocus();
             return false;
         }//if
 
+        // validar el nunero de actos (solo del 1 al 10)
+        String actosStr = txtNumeroActos.getText().trim();
+        if (actosStr.isEmpty()) {
+            JOptionPane.showMessageDialog(this, 
+                "El número de actos es obligatorio.\nPor favor, ingresa un número del 1 al 10.", 
+                "Campo obligatorio", 
+                JOptionPane.WARNING_MESSAGE);
+            txtNumeroActos.requestFocus();
+            return false;
+        }//if
+
         try {
-            int actos = Integer.parseInt(txtNumeroActos.getText().trim());
-            if (actos <= 0 || actos > 10) {
-                javax.swing.JOptionPane.showMessageDialog(this, "Número de actos debe estar entre 1 y 10", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            int actos = Integer.parseInt(actosStr);
+            if (actos < 1 || actos > 10) {
+                JOptionPane.showMessageDialog(this, 
+                    "El número de actos debe estar entre 1 y 10.\nPor ejemplo: 8", 
+                    "Estas ingresando un número dentro de un rango inválido", 
+                    JOptionPane.ERROR_MESSAGE);
+                txtNumeroActos.selectAll();
                 txtNumeroActos.requestFocus();
                 return false;
             }//if
             
         } catch (NumberFormatException e) {
-            javax.swing.JOptionPane.showMessageDialog(this, "Número de actos debe ser un entero válido", "Error", javax.swing.JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, 
+                "El número de actos debe ser un número entero.\nEjemplo: 5", 
+                "Formato numérico inválido", 
+                JOptionPane.ERROR_MESSAGE);
+            txtNumeroActos.selectAll();
             txtNumeroActos.requestFocus();
             return false;
-        }//Catch
+        }//catch
 
-        return true;
-    }//validarCampos
+        return true; //todo ya es valido
+
+    }//validacion de datos
 
     private void cargarObraSeleccionada(int fila) {
         Long idObra = (Long) modeloTabla.getValueAt(fila, 0);

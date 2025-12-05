@@ -170,7 +170,7 @@ public class MainScreen extends JFrame {
             e.printStackTrace();
         }//catch
         SwingUtilities.invokeLater(() -> new MainScreen("miembro").setVisible(true));
-        
+        SwingUtilities.invokeLater(() -> {new ObraVista().setVisible(true);});
     }//void main
     
 }//public class
