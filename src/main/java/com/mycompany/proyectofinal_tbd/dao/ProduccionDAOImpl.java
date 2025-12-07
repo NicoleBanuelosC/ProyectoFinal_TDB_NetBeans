@@ -34,6 +34,9 @@ public class ProduccionDAOImpl implements ProduccionDAO {
     private static final String SELECT_POR_OBRA = 
         "SELECT id_produccion, id_obra, temporada, anio, id_productor FROM Produccion WHERE id_obra = ?";
 
+    //las transacciones ya se encuentran en los metodos
+    //los trigger se activan al usar tablas como miembro
+    
     @Override
     public void insertar(Produccion produccion, Runnable onSuccess, Runnable onError) {
         new Thread(() -> {
@@ -45,7 +48,7 @@ public class ProduccionDAOImpl implements ProduccionDAO {
                     throw new SQLException("No se pudo establecer conexión con la base de datos ");
                 }//if
                 
-                conn.setAutoCommit(false);
+                conn.setAutoCommit(false); //inicia transaccion
 
                 if (!existeObra(conn, produccion.getIdObra())) {
                     throw new SQLException("La obra con ID " + produccion.getIdObra() + " no existe ");
@@ -62,11 +65,11 @@ public class ProduccionDAOImpl implements ProduccionDAO {
                 stmt.setLong(4, produccion.getIdProductor());
                 stmt.executeUpdate();
 
-                conn.commit();
+                conn.commit(); //confirma transaccion
                 onSuccess.run();
             } catch (SQLException e) {
                 try {
-                    if (conn != null) conn.rollback();
+                    if (conn != null) conn.rollback(); //revierte si hay error
                 } catch (SQLException ex) {
                     ex.printStackTrace();
                 }//catch
@@ -95,7 +98,7 @@ public class ProduccionDAOImpl implements ProduccionDAO {
                     throw new SQLException("No se pudo establecer conexión con la base de datos ");
                 }//if
                 
-                conn.setAutoCommit(false);
+                conn.setAutoCommit(false); //inicia transaccion
 
                 if (!existeObra(conn, produccion.getIdObra())) {
                     throw new SQLException("La obra con ID " + produccion.getIdObra() + " no existe ");
@@ -117,7 +120,7 @@ public class ProduccionDAOImpl implements ProduccionDAO {
                     throw new SQLException("No se encontró la producción con ID: " + produccion.getIdProduccion());
                 }//if
 
-                conn.commit();
+                conn.commit(); //confirma transaccion
                 onSuccess.run();
             } catch (SQLException e) {
                 try {
@@ -150,7 +153,7 @@ public class ProduccionDAOImpl implements ProduccionDAO {
                 if (conn == null) {
                     throw new SQLException("No se pudo establecer conexión con la base de datos ");
                 }//if
-                conn.setAutoCommit(false);
+                conn.setAutoCommit(false); //inicia transaccion
 
                 stmt = conn.prepareStatement(DELETE_PRODUCCION);
                 stmt.setLong(1, idProduccion);
@@ -159,7 +162,7 @@ public class ProduccionDAOImpl implements ProduccionDAO {
                     throw new SQLException("No se encontró la producción con ID: " + idProduccion);
                 }//if
 
-                conn.commit();
+                conn.commit(); //confirma
                 onSuccess.run();
                 
             } catch (SQLException e) {
@@ -181,6 +184,7 @@ public class ProduccionDAOImpl implements ProduccionDAO {
         }).start();
     }//eliminar
 
+    //estos metodos no usan transacciones porque solo hacen SELECT (no modifican datos)
     @Override
     public Produccion buscarPorId(Long idProduccion) {
         Connection conn = null;
@@ -303,5 +307,64 @@ public class ProduccionDAOImpl implements ProduccionDAO {
         }//try
         
     }//existeMiembro
+
+    //aqui mando llamar al procedimiento almacenado vender_boleto
+    public void venderBoleto(
+        Long idRepresentacion, Long idPatrono,
+        String fila, int numero,
+        double precio, String tipoBoleto,
+        Runnable onSuccess, Runnable onError
+    ) {
+        new Thread(() -> {
+            try (Connection conn = ConexionBD.getConexion()) {
+                String sql = "{CALL vender_boleto(?, ?, ?, ?, ?, ?)}";
+                try (CallableStatement cs = conn.prepareCall(sql)) {
+                    cs.setLong(1, idRepresentacion);
+                    cs.setLong(2, idPatrono);
+                    cs.setString(3, fila);
+                    cs.setInt(4, numero);
+                    cs.setDouble(5, precio);
+                    cs.setString(6, tipoBoleto);
+                    cs.execute();
+                    onSuccess.run();
+                }//try
+            } catch (SQLException e) {
+                onError.run();
+                e.printStackTrace();
+            }//catch
+        }).start();
+    }//venderBoleto
+
+    //aqui mando llamar mi funcion
+    public double obtenerIngresosPorProduccion(Long idProduccion) {
+        try (Connection conn = ConexionBD.getConexion()) {
+            String sql = "{ ? = call ingresos_por_produccion(?) }";
+            try (CallableStatement cs = conn.prepareCall(sql)) {
+                cs.registerOutParameter(1, Types.NUMERIC);
+                cs.setLong(2, idProduccion);
+                cs.execute();
+                return cs.getDouble(1);
+            }//try
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0.0;
+        }//catch
+    }//obtenerIngresosPorProduccion
+
+    //mando llamar otra funcion
+    public int obtenerTotalBoletosVendidos(Long idRepresentacion) {
+        try (Connection conn = ConexionBD.getConexion()) {
+            String sql = "{ ? = call total_boletos_vendidos(?) }";
+            try (CallableStatement cs = conn.prepareCall(sql)) {
+                cs.registerOutParameter(1, Types.INTEGER);
+                cs.setLong(2, idRepresentacion);
+                cs.execute();
+                return cs.getInt(1);
+            }//try
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return 0;
+        }//catch
+    }//obtenerTotalBoletosVendidos
     
 }//public class
