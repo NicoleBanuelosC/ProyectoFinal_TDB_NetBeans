@@ -3,7 +3,21 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package com.mycompany.proyectofinal_tbd.vista;
-import javax.swing.JOptionPane;
+
+import com.mycompany.proyectofinal_tbd.dao.ObraDAO;
+import com.mycompany.proyectofinal_tbd.dao.ObraDAOImpl;
+import com.mycompany.proyectofinal_tbd.dao.ProduccionDAO;
+import com.mycompany.proyectofinal_tbd.dao.ProduccionDAOImpl;
+import com.mycompany.proyectofinal_tbd.modelo.Obra;
+import com.mycompany.proyectofinal_tbd.modelo.Produccion;
+
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.List;
 
 /**
  *
@@ -266,7 +280,7 @@ public class ObraVista extends javax.swing.JFrame {
             return false;
         }//catch
 
-        return true; //todo ya es valido
+        return true; //todo ya es valido y ya deja hacer el proceso bien
 
     }//validacion de datos
 
