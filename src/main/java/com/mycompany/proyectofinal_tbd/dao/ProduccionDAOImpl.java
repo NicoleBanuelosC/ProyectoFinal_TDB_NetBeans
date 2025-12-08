@@ -9,6 +9,8 @@ import com.mycompany.proyectofinal_tbd.modelo.Produccion;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  *
@@ -366,5 +368,43 @@ public class ProduccionDAOImpl implements ProduccionDAO {
             return 0;
         }//catch
     }//obtenerTotalBoletosVendidos
+
+    //uso de vista para generar listados de consulta multitablas con joins
+    public java.util.List<java.util.Map<String, Object>> listarProduccionesDetalladas() {
+        java.util.List<java.util.Map<String, Object>> lista = new java.util.ArrayList<>();
+        java.sql.Connection conn = null;
+        java.sql.PreparedStatement stmt = null;
+        java.sql.ResultSet rs = null;
+        try {
+            conn = ConexionBD.getConexion();
+            if (conn == null) return lista;
+
+            // consulta a la VISTA (JOIN de Produccion + Obra + Miembro)
+            String sql = "SELECT * FROM vista_producciones_detalles ORDER BY anio DESC";
+            stmt = conn.prepareStatement(sql);
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                java.util.Map<String, Object> fila = new java.util.HashMap<>();
+                fila.put("id", rs.getLong("id_produccion"));
+                fila.put("obra", rs.getString("obra_titulo"));
+                fila.put("autor", rs.getString("obra_autor"));
+                fila.put("temporada", rs.getString("temporada"));
+                fila.put("anio", rs.getInt("anio"));
+                fila.put("productor", rs.getString("productor_nombre"));
+                lista.add(fila);
+            }//while
+            
+        } catch (java.sql.SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rs != null) rs.close();
+                if (stmt != null) stmt.close();
+            } catch (java.sql.SQLException e) {
+                e.printStackTrace();
+            }//catch
+        }//finally
+        return lista;
+    }//listarProduccionesDetalladas
     
 }//public class
