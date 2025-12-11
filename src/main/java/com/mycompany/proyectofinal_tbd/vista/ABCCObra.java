@@ -222,17 +222,35 @@ public class ABCCObra extends JFrame{
         }//if
     }//eliminarObra
 
-    private boolean validarCampos() {
+      private boolean validarCampos() {
         if (txtTitulo.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "El título es obligatorio", "Error", JOptionPane.ERROR_MESSAGE);
             txtTitulo.requestFocus();
             return false;
         }//if
+        
+        // validación: título solo letras, espacios, guiones etc
+        String titulo = txtTitulo.getText().trim();
+        if (!titulo.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ\\-' ]+")) {
+            JOptionPane.showMessageDialog(this, "El título solo puede contener letras, espacios, guiones (-) y apóstrofes (')", "Error", JOptionPane.ERROR_MESSAGE);
+            txtTitulo.requestFocus();
+            return false;
+        }//if
+
         if (txtAutor.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "El autor es obligatorio", "Error", JOptionPane.ERROR_MESSAGE);
             txtAutor.requestFocus();
             return false;
         }//if
+        
+        // validación: autor solo letras y espacios (sin numeros ni simbolos)
+        String autor = txtAutor.getText().trim();
+        if (!autor.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]+")) {
+            JOptionPane.showMessageDialog(this, "El autor solo puede contener letras y espacios", "Error", JOptionPane.ERROR_MESSAGE);
+            txtAutor.requestFocus();
+            return false;
+        }//if
+
         try {
             int actos = Integer.parseInt(txtNumeroActos.getText().trim());
             if (actos <= 0 || actos > 10) {
