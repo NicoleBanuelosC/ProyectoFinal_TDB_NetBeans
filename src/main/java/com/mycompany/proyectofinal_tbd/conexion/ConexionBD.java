@@ -29,7 +29,7 @@ public class ConexionBD {
         try {
             if (conexion == null || conexion.isClosed()) {
                 conexion = DriverManager.getConnection(URL, USER, PASS);
-                System.out.println("Conexión exitosa a Oracle XE");
+                                                 System.out.println("Conexión exitosa a Oracle XE");
             }
         } catch (SQLException e) {
             System.err.println("Error de conexión: " + e.getMessage());

@@ -82,7 +82,7 @@ public class ABCCProduccion extends JFrame{
         comboProductor.setFont(fuenteBase);
         panelForm.add(comboProductor, gbc);
 
-        //botnotes
+        //botones
         JPanel panelBotones = new JPanel(new FlowLayout());
         btnGuardar = new JButton("Guardar");
         btnEditar = new JButton("Editar");
@@ -99,7 +99,7 @@ public class ABCCProduccion extends JFrame{
         panelBotones.add(btnEliminar);
         panelBotones.add(btnLimpiar);
 
-        // tabkita
+        // tabla
         String[] columnas = {"ID", "Obra", "Temporada", "Año", "Productor"};
         modeloTabla = new DefaultTableModel(columnas, 0) {
             @Override public boolean isCellEditable(int row, int column) { return false; }
@@ -182,7 +182,7 @@ public class ABCCProduccion extends JFrame{
             },
             () -> JOptionPane.showMessageDialog(this, "Error al actualizar", "Error", JOptionPane.ERROR_MESSAGE)
         );
-    }//Ediatrproduccion
+    }//EditarProduccion
 
     private void eliminarProduccion() {
         if (produccionSeleccionada == null) {
@@ -215,7 +215,7 @@ public class ABCCProduccion extends JFrame{
         
         try {
             int anio = Integer.parseInt(txtAnio.getText().trim());
-            int anioActual = java.time.Year.now().getValue();
+            int anioActual = Year.now().getValue();
             if (anio < 2000 || anio > anioActual + 1) {
                 JOptionPane.showMessageDialog(this, "Año inválido (2000 - " + (anioActual + 1) + ")", "Error", JOptionPane.ERROR_MESSAGE);
                 txtAnio.requestFocus();
@@ -223,16 +223,24 @@ public class ABCCProduccion extends JFrame{
             }//if
             
         } catch (NumberFormatException e) {
-            JOptionPane.showMessageDialog(this, "El año debe ser un número válido ", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "El año debe ser un número válido", "Error", JOptionPane.ERROR_MESSAGE);
             txtAnio.requestFocus();
             return false;
-        }//Catch
+        }//catch
         
         return true;
     }//validarCampos
 
     private void cargarProduccionSeleccionada(int fila) {
-        JOptionPane.showMessageDialog(this, "Funcionalidad de edición en desarrollo", "Info", JOptionPane.INFORMATION_MESSAGE);
+        Long idProduccion = (Long) modeloTabla.getValueAt(fila, 0);
+        produccionSeleccionada = produccionDAO.buscarPorId(idProduccion);
+
+        if (produccionSeleccionada != null) {
+            comboObra.setSelectedItem(produccionSeleccionada.getIdObra());
+            comboTemporada.setSelectedItem(produccionSeleccionada.getTemporada());
+            txtAnio.setText(String.valueOf(produccionSeleccionada.getAnio()));
+            comboProductor.setSelectedItem(produccionSeleccionada.getIdProductor());
+        }//if
     }//CargarProduccion
 
     private void limpiarFormulario() {
@@ -245,27 +253,45 @@ public class ABCCProduccion extends JFrame{
     }//limpiar
 
     private void cargarListasDesplegables() {
-        //llamadas al doa
-        comboObra.addItem(1L);
-        comboObra.addItem(2L);
+        // Cargar obras reales desde la base de datos
+        comboObra.removeAllItems();
+        java.util.List<com.mycompany.proyectofinal_tbd.modelo.Obra> obras = new com.mycompany.proyectofinal_tbd.dao.ObraDAOImpl().listarTodas();
+        for (com.mycompany.proyectofinal_tbd.modelo.Obra o : obras) {
+            comboObra.addItem(o.getIdObra());
+        }
+
+        // Cargar productores (miembros) reales desde la base de datos
+        comboProductor.removeAllItems();
+        // Si tienes MiembroDAO, reemplaza esto:
         comboProductor.addItem(1L);
         comboProductor.addItem(2L);
+        comboProductor.addItem(3L);
+        // En una versión final, usarías: new MiembroDAOImpl().listarTodos();
     }//CargarListasDesplegables
 
     private void cargarProducciones() {
         modeloTabla.setRowCount(0);
-        //actualizar despues con el dao
-    }
+        java.util.List<Produccion> producciones = produccionDAO.listarTodas();
+        for (Produccion p : producciones) {
+            modeloTabla.addRow(new Object[]{
+                p.getIdProduccion(),
+                p.getIdObra(),
+                p.getTemporada(),
+                p.getAnio(),
+                p.getIdProductor()
+            });
+        }//for
+    }//cargarProducciones
 
     public static void main(String[] args) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             e.printStackTrace();
-        }//cathc
+        }//catch
         
         SwingUtilities.invokeLater(() -> new ABCCProduccion().setVisible(true));
         
-    }//vois main
+    }//void main
     
 }//public class
