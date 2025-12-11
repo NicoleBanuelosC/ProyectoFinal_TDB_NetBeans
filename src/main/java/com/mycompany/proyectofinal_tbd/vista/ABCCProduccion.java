@@ -32,6 +32,12 @@ public class ABCCProduccion extends JFrame{
     private JButton btnGuardar, btnEditar, btnEliminar, btnLimpiar;
     private Produccion produccionSeleccionada = null;
 
+    // colores rosado suave y beige
+    private final Color FONDO_VENTANA = new Color(255, 245, 248);
+    private final Color FONDO_PANEL = new Color(250, 235, 240);
+    private final Color COLOR_BOTON = new Color(180, 120, 140);
+    private final Color COLOR_HEADER = new Color(160, 100, 120);
+
     public ABCCProduccion() {
         setTitle("Gestión de Producciones");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -39,15 +45,19 @@ public class ABCCProduccion extends JFrame{
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
+        // Aplicar fondo
+        getContentPane().setBackground(FONDO_VENTANA);
+
         Font fuenteBase = new Font("Segoe UI", Font.PLAIN, 16);
         Font fuenteBoton = new Font("Segoe UI", Font.BOLD, 16);
 
         JPanel panelForm = new JPanel(new GridBagLayout());
         panelForm.setBorder(BorderFactory.createTitledBorder("Datos de la Producción"));
         panelForm.setFont(fuenteBase);
+        panelForm.setBackground(FONDO_PANEL); // fondo panel
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.insets = new Insets(12, 12, 12, 12); // más espacio
         gbc.anchor = GridBagConstraints.WEST;
 
         gbc.gridx = 0; 
@@ -84,15 +94,16 @@ public class ABCCProduccion extends JFrame{
 
         //botones
         JPanel panelBotones = new JPanel(new FlowLayout());
+        panelBotones.setBackground(FONDO_VENTANA); // mismo fondo
         btnGuardar = new JButton("Guardar");
         btnEditar = new JButton("Editar");
         btnEliminar = new JButton("Eliminar");
         btnLimpiar = new JButton("Limpiar");
 
-        estiloBoton(btnGuardar, fuenteBoton);
-        estiloBoton(btnEditar, fuenteBoton);
-        estiloBoton(btnEliminar, fuenteBoton);
-        estiloBoton(btnLimpiar, fuenteBoton);
+        estiloBoton(btnGuardar, fuenteBoton, COLOR_BOTON);
+        estiloBoton(btnEditar, fuenteBoton, new Color(130, 90, 110));
+        estiloBoton(btnEliminar, fuenteBoton, new Color(190, 80, 100));
+        estiloBoton(btnLimpiar, fuenteBoton, new Color(170, 140, 150));
 
         panelBotones.add(btnGuardar);
         panelBotones.add(btnEditar);
@@ -107,8 +118,14 @@ public class ABCCProduccion extends JFrame{
         
         tablaProducciones = new JTable(modeloTabla);
         tablaProducciones.setFont(fuenteBase);
-        tablaProducciones.setRowHeight(25);
+        tablaProducciones.setRowHeight(28); // ✨ más alto
         tablaProducciones.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        // estilo de tabla
+        tablaProducciones.setSelectionBackground(new Color(220, 190, 200));
+        tablaProducciones.getTableHeader().setBackground(COLOR_HEADER);
+        tablaProducciones.getTableHeader().setForeground(Color.WHITE);
+        tablaProducciones.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 16));
 
         tablaProducciones.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -134,13 +151,15 @@ public class ABCCProduccion extends JFrame{
         cargarProducciones();
     }//public abbcProduccion
 
-    private void estiloBoton(JButton btn, Font fuente) {
+    private void estiloBoton(JButton btn, Font fuente, Color colorFondo) {
         btn.setFont(fuente);
-        btn.setPreferredSize(new Dimension(120, 32));
-        btn.setFocusable(true);
+        btn.setPreferredSize(new Dimension(120, 36)); // tamaño ligeramente mayor
+        btn.setFocusable(false); // mejor experiencia
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setBackground(new Color(139, 115, 85));
+        btn.setBackground(colorFondo);
         btn.setForeground(Color.WHITE);
+        btn.setBorderPainted(false); // sin borde feo
+        btn.setOpaque(true);
     }//EstiloBoton
 
     private void guardarProduccion() {
@@ -253,12 +272,12 @@ public class ABCCProduccion extends JFrame{
     }//limpiar
 
     private void cargarListasDesplegables() {
-        // Cargar obras reales desde la base de datos
+        // cargar obras reales desde la base de datos
         comboObra.removeAllItems();
         java.util.List<com.mycompany.proyectofinal_tbd.modelo.Obra> obras = new com.mycompany.proyectofinal_tbd.dao.ObraDAOImpl().listarTodas();
         for (com.mycompany.proyectofinal_tbd.modelo.Obra o : obras) {
             comboObra.addItem(o.getIdObra());
-        }
+        }//fir
 
         // Cargar productores (miembros) reales desde la base de datos
         comboProductor.removeAllItems();
