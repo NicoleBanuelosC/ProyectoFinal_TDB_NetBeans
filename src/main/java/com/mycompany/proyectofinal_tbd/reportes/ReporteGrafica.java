@@ -5,6 +5,10 @@
 package com.mycompany.proyectofinal_tbd.reportes;
 
 import com.mycompany.proyectofinal_tbd.dao.ProduccionDAOImpl;
+import com.mycompany.proyectofinal_tbd.modelo.Produccion;
+import com.mycompany.proyectofinal_tbd.dao.ObraDAOImpl;
+import com.mycompany.proyectofinal_tbd.modelo.Obra;
+
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -13,57 +17,53 @@ import org.jfree.data.category.DefaultCategoryDataset;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-/**
- *
- * @author banue
- */
+public class ReporteGrafica extends JFrame {
 
-public class ReporteGrafica  extends JFrame{
-        public ReporteGrafica() {
-        setTitle("📈 Gráfica: Ingresos por Producción");
+    public ReporteGrafica() {
+        setTitle("📈 Gráfica: Producciones por Obra");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setSize(850, 600);
         setLocationRelativeTo(null);
 
-        // Dataset
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        ProduccionDAOImpl dao = new ProduccionDAOImpl();
-        var producciones = dao.listarProduccionesDetalladas();
+        ProduccionDAOImpl produccionDAO = new ProduccionDAOImpl();
+        ObraDAOImpl obraDAO = new ObraDAOImpl();
 
-        for (Map<String, Object> p : producciones) {
-            Long id = (Long) p.get("id");
-            String obra = (String) p.get("obra");
-            double ingresos = dao.obtenerIngresosPorProduccion(id);
-            if (ingresos > 0) {
-                dataset.addValue(ingresos, "Ingresos", obra.length() > 20 ? obra.substring(0, 20) + "..." : obra);
-            }
-        }
+        Map<Long, Integer> conteo = new HashMap<>();
+        List<Produccion> producciones = produccionDAO.listarTodas();
+        for (Produccion p : producciones) {
+            conteo.put(p.getIdObra(), conteo.getOrDefault(p.getIdObra(), 0) + 1);
+        }//for
 
-        // Crear gráfica
+        for (Map.Entry<Long, Integer> entry : conteo.entrySet()) {
+            Obra obra = obraDAO.buscarPorId(entry.getKey());
+            String nombre = obra != null ? obra.getTitulo() : "Obra ID: " + entry.getKey();
+            if (nombre.length() > 20) nombre = nombre.substring(0, 17) + "...";
+            dataset.addValue(entry.getValue(), "Producciones", nombre);
+        }//For
+
         JFreeChart chart = ChartFactory.createBarChart(
-            "Ingresos por Producción (USD)",
+            "Número de Producciones por Obra",
             "Obra",
-            "Monto ($)",
+            "Cantidad",
             dataset,
             PlotOrientation.VERTICAL,
             false, true, false
         );
         chart.getTitle().setFont(new Font("Segoe UI", Font.BOLD, 16));
 
-        // Mostrar
         ChartPanel panel = new ChartPanel(chart);
-        panel.setPreferredSize(new Dimension(800, 500));
         add(panel, BorderLayout.CENTER);
 
-        // Botón cerrar
         JButton btnCerrar = new JButton("Cerrar");
         btnCerrar.setBackground(new Color(200, 130, 150));
         btnCerrar.setForeground(Color.WHITE);
         btnCerrar.setFocusPainted(false);
         btnCerrar.addActionListener(e -> dispose());
         add(btnCerrar, BorderLayout.SOUTH);
-    }
-        
-}//ReporteGrafica
+    }//public
+}//public class
