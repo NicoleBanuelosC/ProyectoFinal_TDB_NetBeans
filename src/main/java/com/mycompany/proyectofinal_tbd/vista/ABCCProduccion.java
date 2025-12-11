@@ -262,11 +262,9 @@ public class ABCCProduccion extends JFrame{
 
         // Cargar productores (miembros) reales desde la base de datos
         comboProductor.removeAllItems();
-        // Si tienes MiembroDAO, reemplaza esto:
         comboProductor.addItem(1L);
         comboProductor.addItem(2L);
         comboProductor.addItem(3L);
-        // En una versión final, usarías: new MiembroDAOImpl().listarTodos();
     }//CargarListasDesplegables
 
     private void cargarProducciones() {

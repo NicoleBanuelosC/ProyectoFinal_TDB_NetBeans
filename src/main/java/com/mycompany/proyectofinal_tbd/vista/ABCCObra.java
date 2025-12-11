@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.mycompany.proyectofinal_tbd.vista;
 
 import com.mycompany.proyectofinal_tbd.dao.ObraDAO;
@@ -28,6 +24,12 @@ public class ABCCObra extends JFrame{
     private JButton btnGuardar, btnEditar, btnEliminar, btnLimpiar;
     private Obra obraSeleccionada = null;
 
+    // colores rosado suave y beige
+    private final Color FONDO_VENTANA = new Color(255, 245, 248);
+    private final Color FONDO_PANEL = new Color(250, 235, 240);
+    private final Color COLOR_BOTON = new Color(180, 120, 140);
+    private final Color COLOR_HEADER = new Color(160, 100, 120);
+
     public ABCCObra() {
         setTitle("Gestión de Obras");
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -35,15 +37,19 @@ public class ABCCObra extends JFrame{
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
+        // aplicar colores
+        getContentPane().setBackground(FONDO_VENTANA);
+
         Font fuenteBase = new Font("Segoe UI", Font.PLAIN, 16);
         Font fuenteBoton = new Font("Segoe UI", Font.BOLD, 16);
 
         JPanel panelForm = new JPanel(new GridBagLayout());
         panelForm.setBorder(BorderFactory.createTitledBorder("Datos de la Obra"));
         panelForm.setFont(fuenteBase);
+        panelForm.setBackground(FONDO_PANEL); // fondo panel
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.insets = new Insets(12, 12, 12, 12);
         gbc.anchor = GridBagConstraints.WEST;
 
         gbc.gridx = 0; 
@@ -79,15 +85,16 @@ public class ABCCObra extends JFrame{
         panelForm.add(txtNumeroActos, gbc);
 
         JPanel panelBotones = new JPanel(new FlowLayout());
+        panelBotones.setBackground(FONDO_VENTANA);
         btnGuardar = new JButton("Guardar");
         btnEditar = new JButton("Editar");
         btnEliminar = new JButton("Eliminar");
         btnLimpiar = new JButton("Limpiar");
 
-        estiloBoton(btnGuardar, fuenteBoton);
-        estiloBoton(btnEditar, fuenteBoton);
-        estiloBoton(btnEliminar, fuenteBoton);
-        estiloBoton(btnLimpiar, fuenteBoton);
+        estiloBoton(btnGuardar, fuenteBoton, COLOR_BOTON);
+        estiloBoton(btnEditar, fuenteBoton, new Color(130, 90, 110));
+        estiloBoton(btnEliminar, fuenteBoton, new Color(190, 80, 100));
+        estiloBoton(btnLimpiar, fuenteBoton, new Color(170, 140, 150));
 
         panelBotones.add(btnGuardar);
         panelBotones.add(btnEditar);
@@ -101,8 +108,14 @@ public class ABCCObra extends JFrame{
         };
         tablaObras = new JTable(modeloTabla);
         tablaObras.setFont(fuenteBase);
-        tablaObras.setRowHeight(25);
+        tablaObras.setRowHeight(28);
         tablaObras.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        // estilo de tabla
+        tablaObras.setSelectionBackground(new Color(220, 190, 200));
+        tablaObras.getTableHeader().setBackground(COLOR_HEADER);
+        tablaObras.getTableHeader().setForeground(Color.WHITE);
+        tablaObras.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 16));
 
         tablaObras.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -127,13 +140,15 @@ public class ABCCObra extends JFrame{
         
     }//puiblic abbc obra
 
-    private void estiloBoton(JButton btn, Font fuente) {
+    private void estiloBoton(JButton btn, Font fuente, Color colorFondo) {
         btn.setFont(fuente);
-        btn.setPreferredSize(new Dimension(120, 32));
-        btn.setFocusable(true);
+        btn.setPreferredSize(new Dimension(120, 36));
+        btn.setFocusable(false);
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        btn.setBackground(new Color(139, 115, 85));
+        btn.setBackground(colorFondo);
         btn.setForeground(Color.WHITE);
+        btn.setBorderPainted(false);
+        btn.setOpaque(true);
     }//EstiloBotno
 
     private void guardarObra() {
