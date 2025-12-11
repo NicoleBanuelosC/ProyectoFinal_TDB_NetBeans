@@ -4,7 +4,6 @@
  */
 package com.mycompany.proyectofinal_tbd.vista;
 
-import com.mycompany.proyectofinal_tbd.reportes.PruebaJFreeChart;
 import javax.swing.JOptionPane;  
 import javax.swing.SwingUtilities;  
 import javax.swing.UIManager;  
@@ -221,8 +220,7 @@ public class LoginF extends javax.swing.JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }//try catcuc
-        //SwingUtilities.invokeLater(() -> new LoginF().setVisible(true));
-        SwingUtilities.invokeLater(() -> new PruebaJFreeChart().setVisible(true));
+        SwingUtilities.invokeLater(() -> new LoginF().setVisible(true));
     }//void main
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

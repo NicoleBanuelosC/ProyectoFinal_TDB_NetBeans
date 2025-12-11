@@ -25,7 +25,7 @@ public class MainScreen extends JFrame {
         this.rolActual = rol;
         configurarVentana();
         componentesIniciales();
-    }
+    }//public main
 
     private void configurarVentana() {
         setTitle("Teatro Pleasantville - Sistema Administrativo");
@@ -170,7 +170,7 @@ public class MainScreen extends JFrame {
             e.printStackTrace();
         }//catch
         SwingUtilities.invokeLater(() -> new MainScreen("miembro").setVisible(true));
-        SwingUtilities.invokeLater(() -> {new ObraVista().setVisible(true);});
+        SwingUtilities.invokeLater(() -> {new ABCCObra().setVisible(true);});
     }//void main
     
 }//public class
