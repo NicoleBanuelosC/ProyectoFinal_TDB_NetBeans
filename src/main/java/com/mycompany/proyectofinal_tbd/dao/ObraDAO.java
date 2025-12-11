@@ -17,6 +17,7 @@ public interface ObraDAO {
     void insertar(Obra obra, Runnable onSuccess, Runnable onError);
     void actualizar(Obra obra, Runnable onSuccess, Runnable onError);
     void eliminar(Long idObra, Runnable onSuccess, Runnable onError);
+    boolean existeTitulo(String titulo);
     Obra buscarPorId(Long idObra);
     List<Obra> listarTodas();
 }//public interface

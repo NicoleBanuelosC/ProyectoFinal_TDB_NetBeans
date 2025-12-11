@@ -264,4 +264,19 @@ public class ObraDAOImpl implements ObraDAO {
         
     }//listar
     
+    public boolean existeTitulo(String titulo) {
+        String sql = "SELECT COUNT(*) FROM Obra WHERE LOWER(titulo) = LOWER(?)";
+        try (Connection conn = ConexionBD.getConexion();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, titulo.trim());
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0;
+            }//IF
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }//caths
+        return false;
+    }//existeTitulo
+    
 }//public class

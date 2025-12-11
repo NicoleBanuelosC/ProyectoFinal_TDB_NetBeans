@@ -1,3 +1,7 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
+ */
 package com.mycompany.proyectofinal_tbd.vista;
 
 import com.mycompany.proyectofinal_tbd.dao.ObraDAO;
@@ -222,7 +226,7 @@ public class ABCCObra extends JFrame{
         }//if
     }//eliminarObra
 
-      private boolean validarCampos() {
+    private boolean validarCampos() {
         if (txtTitulo.getText().trim().isEmpty()) {
             JOptionPane.showMessageDialog(this, "El título es obligatorio", "Error", JOptionPane.ERROR_MESSAGE);
             txtTitulo.requestFocus();
@@ -233,6 +237,13 @@ public class ABCCObra extends JFrame{
         String titulo = txtTitulo.getText().trim();
         if (!titulo.matches("[a-zA-ZáéíóúÁÉÍÓÚñÑ\\-' ]+")) {
             JOptionPane.showMessageDialog(this, "El título solo puede contener letras, espacios, guiones (-) y apóstrofes (')", "Error", JOptionPane.ERROR_MESSAGE);
+            txtTitulo.requestFocus();
+            return false;
+        }//if
+
+        // VALIDACIÓN DE TÍTULO ÚNICO
+        if (obraSeleccionada == null && obraDAO.existeTitulo(titulo)) {
+            JOptionPane.showMessageDialog(this, "Ya existe una obra con el título: \"" + titulo + "\"", "Error", JOptionPane.ERROR_MESSAGE);
             txtTitulo.requestFocus();
             return false;
         }//if
