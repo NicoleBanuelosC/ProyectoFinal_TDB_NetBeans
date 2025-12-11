@@ -5,15 +5,23 @@
 package com.mycompany.proyectofinal_tbd.reportes;
 
 import com.mycompany.proyectofinal_tbd.dao.ProduccionDAOImpl;
+import com.mycompany.proyectofinal_tbd.modelo.Produccion;
+import com.mycompany.proyectofinal_tbd.dao.ObraDAOImpl;
+import com.mycompany.proyectofinal_tbd.modelo.Obra;
+import com.mycompany.proyectofinal_tbd.dao.MiembroDAOImpl;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.Map;
+import java.util.List;
+
 /**
- *
+ * 
+ * 
  * @author banue
  */
-public class ReporteProducciones extends JFrame{
+
+public class ReporteProducciones extends JFrame {
 
     public ReporteProducciones() {
         setTitle("📊 Reporte: Producciones Detalladas");
@@ -22,7 +30,7 @@ public class ReporteProducciones extends JFrame{
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
-        String[] columnas = {"ID", "Obra", "Autor", "Temporada", "Año", "Productor", "Ingresos ($)"};
+        String[] columnas = {"ID", "Obra", "Autor", "Temporada", "Año", "Productor"};
         DefaultTableModel modelo = new DefaultTableModel(columnas, 0) {
             @Override public boolean isCellEditable(int row, int column) { return false; }
         };
@@ -33,26 +41,28 @@ public class ReporteProducciones extends JFrame{
         tabla.getTableHeader().setBackground(new Color(230, 180, 200));
         tabla.getTableHeader().setForeground(Color.WHITE);
 
-        JScrollPane scroll = new JScrollPane(tabla);
-        add(scroll, BorderLayout.CENTER);
+        //carga lo datos
+        ProduccionDAOImpl produccionDAO = new ProduccionDAOImpl();
+        ObraDAOImpl obraDAO = new ObraDAOImpl();
+        MiembroDAOImpl miembroDAO = new MiembroDAOImpl();
 
-        // aqui se cargar datos
-        ProduccionDAOImpl dao = new ProduccionDAOImpl();
-        var producciones = dao.listarProduccionesDetalladas();
-        for (Map<String, Object> p : producciones) {
-            Long id = (Long) p.get("id");
-            String obra = (String) p.get("obra");
-            String autor = (String) p.get("autor");
-            String temporada = (String) p.get("temporada");
-            Integer anio = (Integer) p.get("anio");
-            String productor = (String) p.get("productor");
-            double ingresos = dao.obtenerIngresosPorProduccion(id);
+        List<Produccion> producciones = produccionDAO.listarTodas();
+        for (Produccion p : producciones) {
+            Obra obra = obraDAO.buscarPorId(p.getIdObra());
+            String productor = "ID: " + p.getIdProductor(); 
             modelo.addRow(new Object[]{
-                id, obra, autor, temporada, anio, productor, String.format("%.2f", ingresos)
+                p.getIdProduccion(),
+                obra != null ? obra.getTitulo() : "Obra no encontrada",
+                obra != null ? obra.getAutor() : "—",
+                p.getTemporada(),
+                p.getAnio(),
+                productor
             });
         }//for
 
-        //boton cerrar 
+        JScrollPane scroll = new JScrollPane(tabla);
+        add(scroll, BorderLayout.CENTER);
+
         JPanel panelBoton = new JPanel(new FlowLayout());
         JButton btnCerrar = new JButton("Cerrar");
         btnCerrar.setBackground(new Color(200, 130, 150));
@@ -61,6 +71,5 @@ public class ReporteProducciones extends JFrame{
         btnCerrar.addActionListener(e -> dispose());
         panelBoton.add(btnCerrar);
         add(panelBoton, BorderLayout.SOUTH);
-    }//reporteProducciones
-    
-}//ReporteProducciones
+    }//reporte
+}//public class

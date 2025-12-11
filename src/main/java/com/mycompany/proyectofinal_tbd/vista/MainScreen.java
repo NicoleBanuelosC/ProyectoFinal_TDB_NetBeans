@@ -171,6 +171,7 @@ public class MainScreen extends JFrame {
         }//catch
         SwingUtilities.invokeLater(() -> new MainScreen("miembro").setVisible(true));
         SwingUtilities.invokeLater(() -> {new ABCCObra().setVisible(true);});
+        
     }//void main
     
 }//public class
