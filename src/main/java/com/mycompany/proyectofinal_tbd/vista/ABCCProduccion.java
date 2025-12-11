@@ -28,6 +28,7 @@ public class ABCCProduccion extends JFrame{
     private JComboBox<String> comboTemporada;
     private JTextField txtAnio;
     private JComboBox<Long> comboProductor;
+    private JTextField txtBuscarId; 
 
     private JButton btnGuardar, btnEditar, btnEliminar, btnLimpiar;
     private Produccion produccionSeleccionada = null;
@@ -144,7 +145,28 @@ public class ABCCProduccion extends JFrame{
 
         add(panelForm, BorderLayout.NORTH);
         add(new JScrollPane(tablaProducciones), BorderLayout.CENTER);
-        add(panelBotones, BorderLayout.SOUTH);
+
+        // Panel de búsqueda por ID
+        JPanel panelBusqueda = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelBusqueda.setBackground(FONDO_VENTANA);
+        JLabel lblBuscar = new JLabel("🔍 Buscar Producción por ID:");
+        lblBuscar.setFont(fuenteBase);
+        txtBuscarId = new JTextField(12);
+        txtBuscarId.setFont(fuenteBase);
+        JButton btnBuscar = new JButton("Buscar");
+        estiloBoton(btnBuscar, fuenteBoton, new Color(100, 140, 180));
+        btnBuscar.addActionListener(e -> buscarProduccionPorId());
+        panelBusqueda.add(lblBuscar);
+        panelBusqueda.add(txtBuscarId);
+        panelBusqueda.add(btnBuscar);
+
+        // Panel contenedor para botones y búsqueda
+        JPanel panelInferior = new JPanel(new BorderLayout());
+        panelInferior.setBackground(FONDO_VENTANA);
+        panelInferior.add(panelBotones, BorderLayout.NORTH);
+        panelInferior.add(panelBusqueda, BorderLayout.SOUTH);
+
+        add(panelInferior, BorderLayout.SOUTH);
 
         //cargar desde la bd
         cargarListasDesplegables();
@@ -154,7 +176,7 @@ public class ABCCProduccion extends JFrame{
     private void estiloBoton(JButton btn, Font fuente, Color colorFondo) {
         btn.setFont(fuente);
         btn.setPreferredSize(new Dimension(120, 36)); // tamaño ligeramente mayor
-        btn.setFocusable(false); // mejor experiencia
+        btn.setFocusable(false); 
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         btn.setBackground(colorFondo);
         btn.setForeground(Color.WHITE);
@@ -299,6 +321,47 @@ public class ABCCProduccion extends JFrame{
             });
         }//for
     }//cargarProducciones
+
+    private void buscarProduccionPorId() {
+        String idStr = txtBuscarId.getText().trim();
+        if (idStr.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Por favor, ingrese un ID para buscar.", "Campo vacío", JOptionPane.WARNING_MESSAGE);
+            return;
+        }//if
+        try {
+            Long id = Long.parseLong(idStr);
+            Produccion produccion = produccionDAO.buscarPorId(id);
+            if (produccion != null) {
+                // Mostrar solo esa producción en la tabla
+                DefaultTableModel modeloTemp = new DefaultTableModel(new String[]{"ID", "Obra", "Temporada", "Año", "Productor"}, 0) {
+                    @Override public boolean isCellEditable(int r, int c) { return false; }
+                };
+                modeloTemp.addRow(new Object[]{
+                    produccion.getIdProduccion(),
+                    produccion.getIdObra(),
+                    produccion.getTemporada(),
+                    produccion.getAnio(),
+                    produccion.getIdProductor()
+                });
+                tablaProducciones.setModel(modeloTemp);
+                // Cargar en el formulario
+                comboObra.setSelectedItem(produccion.getIdObra());
+                comboTemporada.setSelectedItem(produccion.getTemporada());
+                txtAnio.setText(String.valueOf(produccion.getAnio()));
+                comboProductor.setSelectedItem(produccion.getIdProductor());
+                produccionSeleccionada = produccion;
+            } else {
+                JOptionPane.showMessageDialog(this, "No se encontró producción con ID: " + id, "No encontrado", JOptionPane.INFORMATION_MESSAGE);
+                // Volver a cargar la tabla completa
+                cargarProducciones();
+                limpiarFormulario();
+            }//if
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "ID inválido. Ingrese un número entero.", "Error", JOptionPane.ERROR_MESSAGE);
+            txtBuscarId.selectAll();
+            txtBuscarId.requestFocus();
+        }//catch
+    }//buscarProduccionPorId
 
     public static void main(String[] args) {
         try {
