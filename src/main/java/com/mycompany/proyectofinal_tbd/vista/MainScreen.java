@@ -58,50 +58,50 @@ public class MainScreen extends JFrame {
         actualizarMensajeBienvenida();
     }//componentesIniciales
 
-    private JPanel crearSidebar() {
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(new Color(230, 180, 200));
-        panel.setPreferredSize(new Dimension(220, getHeight()));
+   private JPanel crearSidebar() {
+    JPanel panel = new JPanel();
+    panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+    panel.setBackground(new Color(230, 180, 200));
+    panel.setPreferredSize(new Dimension(220, getHeight()));
 
-        JLabel lblLogo = new JLabel("TEATRO PLEASANTVILLE");
-        lblLogo.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        lblLogo.setForeground(Color.WHITE); 
-        lblLogo.setAlignmentX(Component.LEFT_ALIGNMENT);
-        lblLogo.setBorder(BorderFactory.createEmptyBorder(20, 15, 20, 15));
-        panel.add(lblLogo);
+    JLabel lblLogo = new JLabel("TEATRO PLEASANTVILLE");
+    lblLogo.setFont(new Font("Segoe UI", Font.BOLD, 16));
+    lblLogo.setForeground(Color.WHITE); 
+    lblLogo.setAlignmentX(Component.LEFT_ALIGNMENT);
+    lblLogo.setBorder(BorderFactory.createEmptyBorder(20, 15, 20, 15));
+    panel.add(lblLogo);
 
-        JLabel lblRol = new JLabel("Rol: " + minmay(rolActual));
-        lblRol.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        lblRol.setForeground(Color.WHITE); 
-        lblRol.setAlignmentX(Component.LEFT_ALIGNMENT);
-        lblRol.setBorder(BorderFactory.createEmptyBorder(0, 15, 15, 15));
-        panel.add(lblRol);
+    JLabel lblRol = new JLabel("Rol: " + minmay(rolActual));
+    lblRol.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+    lblRol.setForeground(Color.WHITE); 
+    lblRol.setAlignmentX(Component.LEFT_ALIGNMENT);
+    lblRol.setBorder(BorderFactory.createEmptyBorder(0, 15, 15, 15));
+    panel.add(lblRol);
 
-        JSeparator sep = new JSeparator();
-        sep.setForeground(new Color(255, 255, 255)); 
-        panel.add(sep);
+    JSeparator sep = new JSeparator();
+    sep.setForeground(new Color(255, 255, 255)); 
+    panel.add(sep);
 
-        agregarBoton(panel, "Inicio", e -> mostrarInicio());
-        agregarBoton(panel, "Obras", e -> new ABCCObra().setVisible(true));
-        agregarBoton(panel, "Producciones", e -> new ABCCProduccion().setVisible(true));
-        //agregarBoton(panel, "Reportes", e -> new ReportesView().setVisible(true));
+    agregarBoton(panel, "Inicio", e -> mostrarInicio());
+    agregarBoton(panel, "Obras", e -> new ABCCObra().setVisible(true));
+    agregarBoton(panel, "Producciones", e -> new ABCCProduccion().setVisible(true));
+    agregarBoton(panel, "📊 Reportes", e -> new MenuReportes().setVisible(true)); // ✅ ¡ACTIVADO!
 
-        // cerrar sesión
-        agregarBoton(panel, "Cerrar Sesión", e -> {
-            int confirm = JOptionPane.showConfirmDialog(this,
-                "¿Desea cerrar sesión?",
-                "Confirmar salida",
-                JOptionPane.YES_NO_OPTION);
-            
-            if (confirm == JOptionPane.YES_OPTION) {
-                dispose();
-                new LoginF().setVisible(true);
-            }//if
-        });
+    // cerrar sesión
+    agregarBoton(panel, "Cerrar Sesión", e -> {
+        int confirm = JOptionPane.showConfirmDialog(this,
+            "¿Desea cerrar sesión?",
+            "Confirmar salida",
+            JOptionPane.YES_NO_OPTION);
+        
+        if (confirm == JOptionPane.YES_OPTION) {
+            dispose();
+            new LoginF().setVisible(true);
+        }//if
+    });
 
-        return panel;
-    }//crearSideBar
+    return panel;
+}//crearSideBar
 
     private void agregarBoton(JPanel panel, String texto, ActionListener listener) {
         JButton btn = new JButton(texto);
