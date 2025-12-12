@@ -11,6 +11,8 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.Cursor;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -32,8 +34,22 @@ public class ABCCObra extends JFrame{
     private final Color COLOR_BOTON = new Color(180, 120, 140);
     private final Color COLOR_HEADER = new Color(160, 100, 120);
 
+    private String modo; //aqui defino en que modo lo quiero
+    //tipo, altas, bajas, cambios y consultas
+
+    //recibir el nuevo parametro
+    public ABCCObra(String modo) {
+        this.modo = modo;
+        initGUI();
+    }//public
+
     public ABCCObra() {
-        setTitle("Gestión de Obras");
+        this.modo = "COMPLETO";
+        initGUI();
+    }//public
+
+    private void initGUI() {
+        setTitle("Gestión de Obras - " + modo);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setSize(900, 700);
         setLocationRelativeTo(null);
@@ -44,6 +60,24 @@ public class ABCCObra extends JFrame{
         Font fuenteBase = new Font("Segoe UI", Font.PLAIN, 16);
         Font fuenteBoton = new Font("Segoe UI", Font.BOLD, 16);
 
+        // regresar
+        JPanel panelRegresar = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        panelRegresar.setBackground(FONDO_VENTANA);
+        JButton btnRegresar = new JButton("← Regresar");
+        btnRegresar.setFont(fuenteBoton);
+        btnRegresar.setFocusable(false);
+        btnRegresar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        btnRegresar.setBackground(new Color(100, 140, 180));
+        btnRegresar.setForeground(Color.WHITE);
+        btnRegresar.setBorderPainted(false);
+        btnRegresar.setOpaque(true);
+        btnRegresar.addActionListener(e -> {
+            this.dispose();
+            new SelectorVistas().setVisible(true);
+        });
+        panelRegresar.add(btnRegresar);
+        add(panelRegresar, BorderLayout.NORTH);
+
         JPanel panelForm = new JPanel(new GridBagLayout());
         panelForm.setBorder(BorderFactory.createTitledBorder("Datos de la Obra"));
         panelForm.setFont(fuenteBase);
@@ -53,57 +87,197 @@ public class ABCCObra extends JFrame{
         gbc.insets = new Insets(12, 12, 12, 12);
         gbc.anchor = GridBagConstraints.WEST;
 
-        gbc.gridx = 0; 
-        gbc.gridy = 0;
-        panelForm.add(new JLabel("Título *:"), gbc);
-        gbc.gridx = 1;
-        txtTitulo = new JTextField(20);
-        txtTitulo.setFont(fuenteBase);
-        panelForm.add(txtTitulo, gbc);
+        //en consulta, consultar por id, titulo o autor
+        if ("CONSULTA".equals(modo)) {
+            JLabel lblCriterio = new JLabel("Buscar por:");
+            lblCriterio.setFont(fuenteBase);
+            gbc.gridx = 0; gbc.gridy = 0;
+            panelForm.add(lblCriterio, gbc);
 
-        gbc.gridx = 0; 
-        gbc.gridy = 1;
-        panelForm.add(new JLabel("Autor *:"), gbc);
-        gbc.gridx = 1;
-        txtAutor = new JTextField(20);
-        txtAutor.setFont(fuenteBase);
-        panelForm.add(txtAutor, gbc);
+            ButtonGroup grupoCriterio = new ButtonGroup();
+            JRadioButton radioId = new JRadioButton("ID");
+            JRadioButton radioTitulo = new JRadioButton("Título");
+            JRadioButton radioAutor = new JRadioButton("Autor");
 
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        panelForm.add(new JLabel("Tipo *:"), gbc);
-        gbc.gridx = 1;
-        comboTipo = new JComboBox<>(new String[]{"drama", "comedia", "musical", "infantil", "otro"});
-        comboTipo.setFont(fuenteBase);
-        panelForm.add(comboTipo, gbc);
+            radioId.setFont(fuenteBase);
+            radioTitulo.setFont(fuenteBase);
+            radioAutor.setFont(fuenteBase);
 
-        gbc.gridx = 0; 
-        gbc.gridy = 3;
-        panelForm.add(new JLabel("Número de Actos *:"), gbc);
-        gbc.gridx = 1;
-        txtNumeroActos = new JTextField(10);
-        txtNumeroActos.setFont(fuenteBase);
-        panelForm.add(txtNumeroActos, gbc);
+            grupoCriterio.add(radioId);
+            grupoCriterio.add(radioTitulo);
+            grupoCriterio.add(radioAutor);
+            radioId.setSelected(true);
 
-        // Panel de botones principales (Alta, Editar, Baja, Limpiar)
-        JPanel panelBotones = new JPanel(new FlowLayout());
-        panelBotones.setBackground(FONDO_VENTANA);
-        btnGuardar = new JButton("Guardar");
-        btnEditar = new JButton("Editar");
-        btnEliminar = new JButton("Eliminar");
-        btnLimpiar = new JButton("Limpiar");
+            gbc.gridx = 1; gbc.gridy = 0;
+            panelForm.add(radioId, gbc);
+            gbc.gridx = 2; panelForm.add(radioTitulo, gbc);
+            gbc.gridx = 3; panelForm.add(radioAutor, gbc);
 
-        estiloBoton(btnGuardar, fuenteBoton, COLOR_BOTON);
-        estiloBoton(btnEditar, fuenteBoton, new Color(130, 90, 110));
-        estiloBoton(btnEliminar, fuenteBoton, new Color(190, 80, 100));
-        estiloBoton(btnLimpiar, fuenteBoton, new Color(170, 140, 150));
+            gbc.gridx = 0; gbc.gridy = 1;
+            panelForm.add(new JLabel("Valor:"), gbc);
+            JTextField txtValor = new JTextField(20);
+            txtValor.setFont(fuenteBase);
+            gbc.gridx = 1;
+            gbc.gridwidth = 3;
+            panelForm.add(txtValor, gbc);
+            gbc.gridwidth = 1;
 
-        panelBotones.add(btnGuardar);
-        panelBotones.add(btnEditar);
-        panelBotones.add(btnEliminar);
-        panelBotones.add(btnLimpiar);
+            JButton btnBuscar = new JButton("Buscar");
+            estiloBoton(btnBuscar, fuenteBoton, new Color(100, 140, 180));
+            gbc.gridx = 1; gbc.gridy = 2;
+            panelForm.add(btnBuscar, gbc);
 
-        //tabla
+            // exportar
+            JButton btnExportar = new JButton("Guardar consulta como...");
+            btnExportar.setEnabled(false);
+            estiloBoton(btnExportar, fuenteBoton, new Color(150, 180, 220));
+            gbc.gridx = 2; gbc.gridy = 2;
+            panelForm.add(btnExportar, gbc);
+
+            // busqueda
+            btnBuscar.addActionListener(e -> {
+                String valor = txtValor.getText().trim();
+                if (valor.isEmpty()) {
+                    JOptionPane.showMessageDialog(this, "Por favor ingrese un valor para buscar", "Campo vacío", JOptionPane.WARNING_MESSAGE);
+                    btnExportar.setEnabled(false);
+                    return;
+                }//if
+                try {
+                    java.util.List<Obra> resultados = new ArrayList<>();
+                    if (radioId.isSelected()) {
+                        Long id = Long.parseLong(valor);
+                        Obra obra = obraDAO.buscarPorId(id);
+                        if (obra != null) resultados.add(obra);
+                    } else if (radioTitulo.isSelected()) {
+                        resultados = obraDAO.listarTodas().stream()
+                            .filter(o -> o.getTitulo().toLowerCase().contains(valor.toLowerCase()))
+                            .collect(Collectors.toList());
+                    } else if (radioAutor.isSelected()) {
+                        resultados = obraDAO.listarTodas().stream()
+                            .filter(o -> o.getAutor().toLowerCase().contains(valor.toLowerCase()))
+                            .collect(Collectors.toList());
+                    }//if
+
+                    if (resultados.isEmpty()) {
+                        JOptionPane.showMessageDialog(this, "No se encontraron obras con ese criterio", "No encontrado", JOptionPane.INFORMATION_MESSAGE);
+                        limpiarFormulario();
+                        modeloTabla.setRowCount(0);
+                        btnExportar.setEnabled(false);
+                    } else {
+                        modeloTabla.setRowCount(0);
+                        for (Obra o : resultados) {
+                            modeloTabla.addRow(new Object[]{
+                                o.getIdObra(),
+                                o.getTitulo(),
+                                o.getAutor(),
+                                o.getTipo(),
+                                o.getNumeroActos()
+                            });
+                        }//for
+                        Obra primera = resultados.get(0);
+                        txtTitulo.setText(primera.getTitulo());
+                        txtAutor.setText(primera.getAutor());
+                        comboTipo.setSelectedItem(primera.getTipo());
+                        txtNumeroActos.setText(String.valueOf(primera.getNumeroActos()));
+                        obraSeleccionada = primera;
+                        btnExportar.setEnabled(true);
+                    }//if
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(this, "ID inválido. Ingrese un número entero.", "Error", JOptionPane.ERROR_MESSAGE);
+                    btnExportar.setEnabled(false);
+                }//catch
+            });
+
+            // exportar
+            btnExportar.addActionListener(e -> {
+                if (obraSeleccionada == null) {
+                    JOptionPane.showMessageDialog(this, "No hay obra seleccionada para exportar", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                    return;
+                }//if
+                guardarConsultaComo(obraSeleccionada);
+            });
+
+        } else {
+            //alta, baja y cambio
+            gbc.gridx = 0; 
+            gbc.gridy = 0;
+            panelForm.add(new JLabel("Título *:"), gbc);
+            gbc.gridx = 1;
+            txtTitulo = new JTextField(20);
+            txtTitulo.setFont(fuenteBase);
+            txtTitulo.setEditable(!"CONSULTA".equals(modo));
+            panelForm.add(txtTitulo, gbc);
+
+            gbc.gridx = 0; 
+            gbc.gridy = 1;
+            panelForm.add(new JLabel("Autor *:"), gbc);
+            gbc.gridx = 1;
+            txtAutor = new JTextField(20);
+            txtAutor.setFont(fuenteBase);
+            txtAutor.setEditable(!"CONSULTA".equals(modo));
+            panelForm.add(txtAutor, gbc);
+
+            gbc.gridx = 0;
+            gbc.gridy = 2;
+            panelForm.add(new JLabel("Tipo *:"), gbc);
+            gbc.gridx = 1;
+            comboTipo = new JComboBox<>(new String[]{"drama", "comedia", "musical", "infantil", "otro"});
+            comboTipo.setFont(fuenteBase);
+            comboTipo.setEnabled(!"CONSULTA".equals(modo));
+            panelForm.add(comboTipo, gbc);
+
+            gbc.gridx = 0; 
+            gbc.gridy = 3;
+            panelForm.add(new JLabel("Número de Actos *:"), gbc);
+            gbc.gridx = 1;
+            txtNumeroActos = new JTextField(10);
+            txtNumeroActos.setFont(fuenteBase);
+            txtNumeroActos.setEditable(!"CONSULTA".equals(modo));
+            panelForm.add(txtNumeroActos, gbc);
+        }
+
+        // no mostrar botones en consulta
+        if (!"CONSULTA".equals(modo)) {
+            JPanel panelBotones = new JPanel(new FlowLayout());
+            panelBotones.setBackground(FONDO_VENTANA);
+            btnGuardar = new JButton("Guardar");
+            btnEditar = new JButton("Editar");
+            btnEliminar = new JButton("Eliminar");
+            btnLimpiar = new JButton("Limpiar");
+
+            estiloBoton(btnGuardar, fuenteBoton, COLOR_BOTON);
+            estiloBoton(btnEditar, fuenteBoton, new Color(130, 90, 110));
+            estiloBoton(btnEliminar, fuenteBoton, new Color(190, 80, 100));
+            estiloBoton(btnLimpiar, fuenteBoton, new Color(170, 140, 150));
+
+            if ("ALTA".equals(modo)) {
+                panelBotones.add(btnGuardar);
+                panelBotones.add(btnLimpiar);
+                
+            } else if ("BAJA".equals(modo)) {
+                panelBotones.add(btnEliminar);
+                panelBotones.add(btnLimpiar);
+                
+            } else if ("CAMBIO".equals(modo)) {
+                panelBotones.add(btnEditar);
+                panelBotones.add(btnLimpiar);
+                
+            } else {
+                panelBotones.add(btnGuardar);
+                panelBotones.add(btnEditar);
+                panelBotones.add(btnEliminar);
+                panelBotones.add(btnLimpiar);
+            }//Else
+
+            btnGuardar.addActionListener(e -> guardarObra());
+            btnEditar.addActionListener(e -> editarObra());
+            btnEliminar.addActionListener(e -> eliminarObra());
+            btnLimpiar.addActionListener(e -> limpiarFormulario());
+
+            add(panelBotones, BorderLayout.PAGE_END);
+        }//id
+
+        // tanlita
         String[] columnas = {"ID", "Título", "Autor", "Tipo", "Actos"};
         modeloTabla = new DefaultTableModel(columnas, 0) {
             @Override public boolean isCellEditable(int row, int column) { return false; }
@@ -124,41 +298,15 @@ public class ABCCObra extends JFrame{
                 if (fila >= 0) {
                     cargarObraSeleccionada(fila);
                 }//if adentro
+                
             }//if afeura
         });
 
-        btnGuardar.addActionListener(e -> guardarObra());
-        btnEditar.addActionListener(e -> editarObra());
-        btnEliminar.addActionListener(e -> eliminarObra());
-        btnLimpiar.addActionListener(e -> limpiarFormulario());
-
-        add(panelForm, BorderLayout.NORTH);
-        add(new JScrollPane(tablaObras), BorderLayout.CENTER);
-
-        // Panel de búsqueda por ID
-        JPanel panelBusqueda = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        panelBusqueda.setBackground(FONDO_VENTANA);
-        JLabel lblBuscar = new JLabel("🔍 Buscar Obra por ID:");
-        lblBuscar.setFont(fuenteBase);
-        txtBuscarId = new JTextField(12);
-        txtBuscarId.setFont(fuenteBase);
-        JButton btnBuscar = new JButton("Buscar");
-        estiloBoton(btnBuscar, fuenteBoton, new Color(100, 140, 180));
-        btnBuscar.addActionListener(e -> buscarObraPorId());
-        panelBusqueda.add(lblBuscar);
-        panelBusqueda.add(txtBuscarId);
-        panelBusqueda.add(btnBuscar);
-
-        // Panel contenedor para incluir ambos: botones y búsqueda
-        JPanel panelInferior = new JPanel(new BorderLayout());
-        panelInferior.setBackground(FONDO_VENTANA);
-        panelInferior.add(panelBotones, BorderLayout.NORTH);
-        panelInferior.add(panelBusqueda, BorderLayout.SOUTH);
-
-        add(panelInferior, BorderLayout.SOUTH);
+        add(panelForm, BorderLayout.CENTER);
+        add(new JScrollPane(tablaObras), BorderLayout.SOUTH);
 
         cargarObras();
-    }//puiblic abbc obra
+    }//initGUI
 
     private void estiloBoton(JButton btn, Font fuente, Color colorFondo) {
         btn.setFont(fuente);
@@ -178,6 +326,7 @@ public class ABCCObra extends JFrame{
         obra.setAutor(txtAutor.getText().trim());
         obra.setTipo((String) comboTipo.getSelectedItem());
         obra.setNumeroActos(Integer.parseInt(txtNumeroActos.getText().trim()));
+        
         obraDAO.insertar(obra, () -> {
                 JOptionPane.showMessageDialog(this, "Obra guardada", "Éxito", JOptionPane.INFORMATION_MESSAGE);
                 limpiarFormulario();
@@ -192,6 +341,7 @@ public class ABCCObra extends JFrame{
             JOptionPane.showMessageDialog(this, "Seleccione una obra", "Advertencia", JOptionPane.WARNING_MESSAGE);
             return;
         }//if
+        
         if (!validarCampos()) return;
         obraSeleccionada.setTitulo(txtTitulo.getText().trim());
         obraSeleccionada.setAutor(txtAutor.getText().trim());
@@ -211,10 +361,12 @@ public class ABCCObra extends JFrame{
             JOptionPane.showMessageDialog(this, "Seleccione una obra", "Advertencia", JOptionPane.WARNING_MESSAGE);
             return;
         }//if
+        
         int confirm = JOptionPane.showConfirmDialog(this,
             "¿Eliminar la obra '" + obraSeleccionada.getTitulo() + "'?\n(Se eliminarán sus producciones si existen)",
             "Confirmar eliminación",
             JOptionPane.YES_NO_OPTION);
+        
         if (confirm == JOptionPane.YES_OPTION) {
             obraDAO.eliminar(obraSeleccionada.getIdObra(), () -> {
                     JOptionPane.showMessageDialog(this, "Obra eliminada", "Éxito", JOptionPane.INFORMATION_MESSAGE);
@@ -241,7 +393,7 @@ public class ABCCObra extends JFrame{
             return false;
         }//if
 
-        // VALIDACIÓN DE TÍTULO ÚNICO
+        // validacion de que solo haya una obra con ese unico titulo
         if (obraSeleccionada == null && obraDAO.existeTitulo(titulo)) {
             JOptionPane.showMessageDialog(this, "Ya existe una obra con el título: \"" + titulo + "\"", "Error", JOptionPane.ERROR_MESSAGE);
             txtTitulo.requestFocus();
@@ -350,6 +502,39 @@ public class ABCCObra extends JFrame{
             txtBuscarId.requestFocus();
         }//catch
     }//buscarObraPorId
+
+    private void guardarConsultaComo(Obra obra) {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setSelectedFile(new java.io.File("Consulta_Obra_" + obra.getIdObra() + ".txt"));
+        int result = chooser.showSaveDialog(this);
+        if (result != JFileChooser.APPROVE_OPTION) return;
+
+        String ruta = chooser.getSelectedFile().getAbsolutePath();
+        if (!ruta.endsWith(".txt")) ruta += ".txt";
+
+        try (java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter(ruta))) {
+            String fechaHora = java.time.LocalDateTime.now()
+                .format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+
+            writer.write("Se consultó la obra con ID: " + obra.getIdObra());
+            writer.newLine();
+            writer.write("Título: " + obra.getTitulo());
+            writer.newLine();
+            writer.write("Autor: " + obra.getAutor());
+            writer.newLine();
+            writer.write("Tipo: " + obra.getTipo());
+            writer.newLine();
+            writer.write("Número de Actos: " + obra.getNumeroActos());
+            writer.newLine();
+            writer.newLine();
+            writer.write("Fecha y hora de la consulta: " + fechaHora);
+
+            JOptionPane.showMessageDialog(this, "✅ Consulta guardada:\n" + ruta, "Éxito", JOptionPane.INFORMATION_MESSAGE);
+        } catch (java.io.IOException ex) {
+            ex.printStackTrace();
+            JOptionPane.showMessageDialog(this, "❌ Error al guardar el archivo", "Error", JOptionPane.ERROR_MESSAGE);
+        }//catch
+    }//guardarConsultaComo
 
     public static void main(String[] args) {
         try {
