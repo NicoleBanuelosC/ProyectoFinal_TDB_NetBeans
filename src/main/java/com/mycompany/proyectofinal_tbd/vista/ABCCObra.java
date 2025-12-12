@@ -57,8 +57,9 @@ public class ABCCObra extends JFrame{
 
         getContentPane().setBackground(FONDO_VENTANA);
 
-        Font fuenteBase = new Font("Segoe UI", Font.PLAIN, 16);
-        Font fuenteBoton = new Font("Segoe UI", Font.BOLD, 16);
+        Font fuenteBase = new Font("Segoe UI", Font.PLAIN, 15);
+        Font fuenteBoton = new Font("Segoe UI", Font.BOLD, 15);
+        Font fuenteTitulo = new Font("Segoe UI", Font.BOLD, 17);
 
         // regresar
         JPanel panelRegresar = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -84,13 +85,13 @@ public class ABCCObra extends JFrame{
         panelForm.setBackground(FONDO_PANEL);
 
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(12, 12, 12, 12);
+        gbc.insets = new Insets(10, 10, 10, 10);
         gbc.anchor = GridBagConstraints.WEST;
 
-        //en consulta, consultar por id, titulo o autor
         if ("CONSULTA".equals(modo)) {
+            //consulta mood
             JLabel lblCriterio = new JLabel("Buscar por:");
-            lblCriterio.setFont(fuenteBase);
+            lblCriterio.setFont(fuenteTitulo);
             gbc.gridx = 0; gbc.gridy = 0;
             panelForm.add(lblCriterio, gbc);
 
@@ -122,19 +123,17 @@ public class ABCCObra extends JFrame{
             panelForm.add(txtValor, gbc);
             gbc.gridwidth = 1;
 
-            JButton btnBuscar = new JButton("Buscar");
+            JButton btnBuscar = new JButton("🔍 Buscar");
             estiloBoton(btnBuscar, fuenteBoton, new Color(100, 140, 180));
             gbc.gridx = 1; gbc.gridy = 2;
             panelForm.add(btnBuscar, gbc);
 
-            // exportar
-            JButton btnExportar = new JButton("Guardar consulta como...");
+            JButton btnExportar = new JButton("💾 Guardar consulta como...");
             btnExportar.setEnabled(false);
             estiloBoton(btnExportar, fuenteBoton, new Color(150, 180, 220));
             gbc.gridx = 2; gbc.gridy = 2;
             panelForm.add(btnExportar, gbc);
 
-            // busqueda
             btnBuscar.addActionListener(e -> {
                 String valor = txtValor.getText().trim();
                 if (valor.isEmpty()) {
@@ -158,13 +157,12 @@ public class ABCCObra extends JFrame{
                             .collect(Collectors.toList());
                     }//if
 
+                    modeloTabla.setRowCount(0);
                     if (resultados.isEmpty()) {
                         JOptionPane.showMessageDialog(this, "No se encontraron obras con ese criterio", "No encontrado", JOptionPane.INFORMATION_MESSAGE);
                         limpiarFormulario();
-                        modeloTabla.setRowCount(0);
                         btnExportar.setEnabled(false);
                     } else {
-                        modeloTabla.setRowCount(0);
                         for (Obra o : resultados) {
                             modeloTabla.addRow(new Object[]{
                                 o.getIdObra(),
@@ -188,7 +186,6 @@ public class ABCCObra extends JFrame{
                 }//catch
             });
 
-            // exportar
             btnExportar.addActionListener(e -> {
                 if (obraSeleccionada == null) {
                     JOptionPane.showMessageDialog(this, "No hay obra seleccionada para exportar", "Advertencia", JOptionPane.WARNING_MESSAGE);
@@ -198,27 +195,24 @@ public class ABCCObra extends JFrame{
             });
 
         } else {
-            //alta, baja y cambio
-            gbc.gridx = 0; 
-            gbc.gridy = 0;
+            // Modos ALTA, BAJA, CAMBIO: formulario normal + tabla con TODOS los registros
+            gbc.gridx = 0; gbc.gridy = 0;
             panelForm.add(new JLabel("Título *:"), gbc);
             gbc.gridx = 1;
-            txtTitulo = new JTextField(20);
+            txtTitulo = new JTextField(25);
             txtTitulo.setFont(fuenteBase);
             txtTitulo.setEditable(!"CONSULTA".equals(modo));
             panelForm.add(txtTitulo, gbc);
 
-            gbc.gridx = 0; 
-            gbc.gridy = 1;
+            gbc.gridx = 0; gbc.gridy = 1;
             panelForm.add(new JLabel("Autor *:"), gbc);
             gbc.gridx = 1;
-            txtAutor = new JTextField(20);
+            txtAutor = new JTextField(25);
             txtAutor.setFont(fuenteBase);
             txtAutor.setEditable(!"CONSULTA".equals(modo));
             panelForm.add(txtAutor, gbc);
 
-            gbc.gridx = 0;
-            gbc.gridy = 2;
+            gbc.gridx = 0; gbc.gridy = 2;
             panelForm.add(new JLabel("Tipo *:"), gbc);
             gbc.gridx = 1;
             comboTipo = new JComboBox<>(new String[]{"drama", "comedia", "musical", "infantil", "otro"});
@@ -226,8 +220,7 @@ public class ABCCObra extends JFrame{
             comboTipo.setEnabled(!"CONSULTA".equals(modo));
             panelForm.add(comboTipo, gbc);
 
-            gbc.gridx = 0; 
-            gbc.gridy = 3;
+            gbc.gridx = 0; gbc.gridy = 3;
             panelForm.add(new JLabel("Número de Actos *:"), gbc);
             gbc.gridx = 1;
             txtNumeroActos = new JTextField(10);
@@ -236,14 +229,14 @@ public class ABCCObra extends JFrame{
             panelForm.add(txtNumeroActos, gbc);
         }
 
-        // no mostrar botones en consulta
+        // Panel de botones (solo en modos no CONSULTA)
         if (!"CONSULTA".equals(modo)) {
             JPanel panelBotones = new JPanel(new FlowLayout());
             panelBotones.setBackground(FONDO_VENTANA);
-            btnGuardar = new JButton("Guardar");
-            btnEditar = new JButton("Editar");
-            btnEliminar = new JButton("Eliminar");
-            btnLimpiar = new JButton("Limpiar");
+            btnGuardar = new JButton("✅ Guardar");
+            btnEditar = new JButton("✏️ Editar");
+            btnEliminar = new JButton("🗑️ Eliminar");
+            btnLimpiar = new JButton("🧹 Limpiar");
 
             estiloBoton(btnGuardar, fuenteBoton, COLOR_BOTON);
             estiloBoton(btnEditar, fuenteBoton, new Color(130, 90, 110));
@@ -253,31 +246,28 @@ public class ABCCObra extends JFrame{
             if ("ALTA".equals(modo)) {
                 panelBotones.add(btnGuardar);
                 panelBotones.add(btnLimpiar);
-                
             } else if ("BAJA".equals(modo)) {
                 panelBotones.add(btnEliminar);
                 panelBotones.add(btnLimpiar);
-                
             } else if ("CAMBIO".equals(modo)) {
                 panelBotones.add(btnEditar);
                 panelBotones.add(btnLimpiar);
-                
             } else {
                 panelBotones.add(btnGuardar);
                 panelBotones.add(btnEditar);
                 panelBotones.add(btnEliminar);
                 panelBotones.add(btnLimpiar);
-            }//Else
+            }
 
             btnGuardar.addActionListener(e -> guardarObra());
             btnEditar.addActionListener(e -> editarObra());
             btnEliminar.addActionListener(e -> eliminarObra());
             btnLimpiar.addActionListener(e -> limpiarFormulario());
 
-            add(panelBotones, BorderLayout.PAGE_END);
-        }//id
+            add(panelBotones, BorderLayout.SOUTH);
+        }
 
-        // tanlita
+        // Tabla: siempre se muestra, pero en CONSULTA empieza vacía
         String[] columnas = {"ID", "Título", "Autor", "Tipo", "Actos"};
         modeloTabla = new DefaultTableModel(columnas, 0) {
             @Override public boolean isCellEditable(int row, int column) { return false; }
@@ -286,11 +276,10 @@ public class ABCCObra extends JFrame{
         tablaObras.setFont(fuenteBase);
         tablaObras.setRowHeight(28);
         tablaObras.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
         tablaObras.setSelectionBackground(new Color(220, 190, 200));
         tablaObras.getTableHeader().setBackground(COLOR_HEADER);
         tablaObras.getTableHeader().setForeground(Color.WHITE);
-        tablaObras.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 16));
+        tablaObras.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 15));
 
         tablaObras.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
@@ -298,14 +287,18 @@ public class ABCCObra extends JFrame{
                 if (fila >= 0) {
                     cargarObraSeleccionada(fila);
                 }//if adentro
-                
             }//if afeura
         });
 
-        add(panelForm, BorderLayout.CENTER);
-        add(new JScrollPane(tablaObras), BorderLayout.SOUTH);
+        add(panelForm, BorderLayout.NORTH);
+        add(new JScrollPane(tablaObras), BorderLayout.CENTER);
 
-        cargarObras();
+        // Cargar todos los registros en modos no CONSULTA
+        if ("CONSULTA".equals(modo)) {
+            modeloTabla.setRowCount(0); // tabla vacía al inicio
+        } else {
+            cargarObras(); // ¡todos los registros!
+        }
     }//initGUI
 
     private void estiloBoton(JButton btn, Font fuente, Color colorFondo) {

@@ -83,9 +83,9 @@ public class MainScreen extends JFrame {
     panel.add(sep);
 
     agregarBoton(panel, "Inicio", e -> mostrarInicio());
-    agregarBoton(panel, "Obras", e -> new ABCCObra().setVisible(true));
+    agregarBoton(panel, "Obras", e -> new SelectorVistas().setVisible(true));
     agregarBoton(panel, "Producciones", e -> new ABCCProduccion().setVisible(true));
-    agregarBoton(panel, "📊 Reportes", e -> new MenuReportes().setVisible(true)); // ✅ ¡ACTIVADO!
+    agregarBoton(panel, "📊 Reportes", e -> new MenuReportes().setVisible(true)); 
 
     // cerrar sesión
     agregarBoton(panel, "Cerrar Sesión", e -> {
@@ -119,9 +119,11 @@ public class MainScreen extends JFrame {
             public void mouseEntered(MouseEvent evt) {
                 btn.setBackground(new Color(170, 100, 120)); 
             }//mouseEntred
+            
             public void mouseExited(MouseEvent evt) {
                 btn.setBackground(new Color(200, 130, 150)); 
             }//mouseExited
+            
         });
 
         panel.add(btn);
@@ -170,7 +172,6 @@ public class MainScreen extends JFrame {
             e.printStackTrace();
         }//catch
         SwingUtilities.invokeLater(() -> new MainScreen("miembro").setVisible(true));
-        SwingUtilities.invokeLater(() -> {new ABCCObra().setVisible(true);});
         
     }//void main
     
